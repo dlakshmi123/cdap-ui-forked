@@ -1,0 +1,496 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+ Copyright (c) 2013, Continuuity Inc
+
+ All rights reserved.
+
+ Redistribution and use in source and binary forms,
+ with or without modification, are not permitted
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<configuration>
+
+    <property>
+        <name>reactor.namespace</name>
+        <value>/continuuity</value>
+        <description>Specifies the namespace for this instance of reactor.</description>
+    </property>
+
+    <property>
+        <name>zookeeper.quorum</name>
+        <value>127.0.0.1:2181${reactor.namespace}</value>
+        <description>Specifies the zookeeper host:port</description>
+    </property>
+
+    <property>
+        <name>thrift.max.read.buffer</name>
+        <value>16777216</value>
+        <description>
+            Specifies the max read buffer size used by
+            thrift server. Value should be set to something greater
+            than max frame that is sent on RPC channel.
+        </description>
+    </property>
+
+    <property>
+        <name>weave.zookeeper.namespace</name>
+        <value>/weave</value>
+        <description>Namespace prefix for weave zookeeper</description>
+    </property>
+
+    <property>
+        <name>hdfs.namespace</name>
+        <value>${reactor.namespace}</value>
+        <description>Namespace for files written by reactor.</description>
+    </property>
+
+    <property>
+        <name>hdfs.user</name>
+        <value>yarn</value>
+        <description>User name for accessing HDFS.</description>
+    </property>
+
+    <property>
+        <name>yarn.user</name>
+        <value>yarn</value>
+        <description>User name for running applications in YARN.</description>
+    </property>
+
+    <property>
+        <name>local.data.dir</name>
+        <value>data</value>
+        <description>Data directory for local mode</description>
+    </property>
+
+    <!--
+        Gateway configuration
+    -->
+    <property>
+        <name>gateway.server.address</name>
+        <value>localhost</value>
+        <description>Specifies the hostname on which the Gateway will listen</description>
+    </property>
+
+    <property>
+        <name>gateway.port</name>
+        <value>9999</value>
+        <description>Specifies the port on which the Gateway will listen</description>
+    </property>
+
+    <property>
+        <name>gateway.connectors</name>
+        <value>data.rest,stream.flume,meta.rest</value>
+        <description>Specifies the list of Collectors we will use</description>
+    </property>
+
+    <property>
+        <name>data.rest.class</name>
+        <value>com.continuuity.gateway.accessor.DatasetRestAccessor</value>
+        <description>Specifies the class for the REST accessor</description>
+    </property>
+
+    <property>
+        <name>data.rest.port</name>
+        <value>10002</value>
+    </property>
+
+    <property>
+        <name>data.rest.threads</name>
+        <value>20</value>
+    </property>
+
+    <property>
+        <name>data.rest.middle</name>
+        <value>/data/</value>
+    </property>
+
+    <property>
+        <name>gateway.connection.backlog</name>
+        <value>20000</value>
+        <description>Max connection backlog of gateway</description>
+    </property>
+
+    <property>
+        <name>gateway.max.cached.stream.events.num</name>
+        <value>10000</value>
+        <description>Max number of stream events cached before flushing</description>
+    </property>
+
+    <property>
+        <name>gateway.max.cached.events.per.stream.num</name>
+        <value>5000</value>
+        <description>Max number of stream events of a single stream cached before flushing</description>
+    </property>
+
+    <property>
+        <name>gateway.max.cached.stream.events.bytes</name>
+        <value>52428800</value>
+        <description>Max size of stream events cached before flushing</description>
+    </property>
+
+    <property>
+        <name>gateway.stream.events.flush.interval.ms</name>
+        <value>150</value>
+        <description>Specifies the interval at which cached stream events get flushed</description>
+    </property>
+
+    <property>
+        <name>gateway.stream.callback.exec.num.threads</name>
+        <value>5</value>
+        <description>Number of threads in stream events callback executor</description>
+    </property>
+
+    <property>
+        <name>gateway.exec.threads</name>
+        <value>20</value>
+        <description>Number of netty server executor threads</description>
+    </property>
+
+    <property>
+        <name>gateway.boss.threads</name>
+        <value>1</value>
+        <description>Number of netty server boss threads</description>
+    </property>
+
+    <property>
+        <name>gateway.worker.threads</name>
+        <value>10</value>
+        <description>Number of netty server worker threads</description>
+    </property>
+
+
+    <!-- Metadata Connector -->
+    <property>
+        <name>meta.rest.class</name>
+        <value>com.continuuity.gateway.accessor.MetaDataRestAccessor</value>
+        <description>Specifies the class for the meta data REST accessor</description>
+    </property>
+
+    <property>
+        <name>meta.rest.port</name>
+        <value>10011</value>
+    </property>
+
+    <property>
+        <name>meta.rest.threads</name>
+        <value>5</value>
+    </property>
+
+    <property>
+        <name>meta.rest.middle</name>
+        <value>/metadata/</value>
+    </property>
+
+    <!-- Stream handles -->
+    <property>
+        <name>stream.rest.port</name>
+        <value>10000</value>
+    </property>
+
+    <property>
+        <name>stream.flume.class</name>
+        <value>com.continuuity.gateway.collector.NettyFlumeCollector</value>
+        <description>Specifies the class for the Flume collector</description>
+    </property>
+
+    <property>
+        <name>stream.flume.port</name>
+        <value>10004</value>
+    </property>
+
+    <property>
+        <name>stream.flume.threads</name>
+        <value>20</value>
+    </property>
+
+    <!--
+        Data Fabric configuration
+    -->
+    <property>
+        <name>data.local.storage</name>
+        <value>${local.data.dir}/ldb</value>
+        <description>Specifies the database directory</description>
+    </property>
+
+    <property>
+        <name>data.local.storage.blocksize</name>
+        <value>1024</value>
+        <description>Specifies block size (in bytes)</description>
+    </property>
+
+    <property>
+        <name>data.local.storage.cachesize</name>
+        <value>104857600</value>
+        <description>Specifies cache size (in bytes)</description>
+    </property>
+
+    <property>
+        <name>data.opex.server.port</name>
+        <value>15165</value>
+        <description>The port number for the operation executor
+            service</description>
+    </property>
+
+    <property>
+        <name>data.opex.server.address</name>
+        <value>127.0.0.1</value>
+        <description>The inet address for the operation executor
+            service</description>
+    </property>
+
+    <property>
+        <name>data.opex.server.io.threads</name>
+        <value>2</value>
+        <description>The number of IO threads for the operation executor
+            service</description>
+    </property>
+
+    <property>
+        <name>data.opex.server.threads</name>
+        <value>25</value>
+        <description>The number of threads for the operation executor
+            service</description>
+    </property>
+
+    <property>
+        <name>data.opex.client.count</name>
+        <value>5</value>
+        <description>The number of pooled instanced of the operation
+            executor client</description>
+    </property>
+
+    <property>
+        <name>data.opex.client.provider</name>
+        <!-- value>pool</value -->
+        <value>thread-local</value>
+        <description>The provider strategy for operation executor clients.
+            Valid values are "pool" and "thread-local". </description>
+    </property>
+
+    <property>
+        <name>data.queue.table.name</name>
+        <value>queues</value>
+        <description>Specifies the name of the table for queues.</description>
+    </property>
+
+    <!--
+        Metadata service configuration
+    -->
+    <property>
+        <name>metadata.server.address</name>
+        <value>127.0.0.1</value>
+        <description>Specifies the server address of metadata
+            server</description>
+    </property>
+
+    <property>
+        <name>metadata.server.port</name>
+        <value>45004</value>
+        <description>Specifies the port on which metdata server
+            is started on</description>
+    </property>
+
+
+    <!--
+      Log collection service configuration
+    -->
+    <property>
+        <name>log.query.server.address</name>
+        <value>127.0.0.1</value>
+        <description>Specifies the server address of metrics frontend
+            server</description>
+    </property>
+
+    <property>
+        <name>log.query.server.port</name>
+        <value>45002</value>
+        <description>Specifies the port on which frontend metrics server
+            is started on</description>
+    </property>
+
+    <property>
+        <name>log.collection.server.address</name>
+        <value>127.0.0.1</value>
+        <description>Specifies the hostname where the collection service runs</description>
+    </property>
+
+    <property>
+        <name>log.collection.port</name>
+        <value>12157</value>
+        <description>Port the log collection service runs on</description>
+    </property>
+
+    <property>
+        <name>log.collection.root</name>
+        <value>${local.data.dir}/logs</value>
+        <description>Root location for collecting logs</description>
+    </property>
+
+    <!--
+        Account service configuration
+    -->
+    <property>
+        <name>account.server.host</name>
+        <value>127.0.0.1</value>
+        <description>Specifies the host for account server</description>
+    </property>
+
+    <property>
+        <name>account.server.port</name>
+        <value>8080</value>
+        <description>Specifies the port for account server</description>
+    </property>
+
+    <!-- App Fabric related changes -->
+    <property>
+        <name>app.server.port</name>
+        <value>45000</value>
+        <description>App Fabric Server Port</description>
+    </property>
+
+    <property>
+        <name>app.server.address</name>
+        <value>127.0.0.1</value>
+        <description>Host address on which the app fabric server is started.</description>
+    </property>
+
+    <property>
+        <name>app.output.dir</name>
+        <value>/programs</value>
+        <description>Directory where all archives are stored.</description>
+    </property>
+
+    <property>
+        <name>app.temp.dir</name>
+        <value>/tmp</value>
+        <description>Directory temp.</description>
+    </property>
+
+
+    <!-- Sets whether Devsuite is in Cloud or no -->
+    <!-- AppFabric will become Reactor later -->
+    <property>
+        <name>appfabric.environment</name>
+        <value>devsuite</value>
+        <description>Sets the environment the appfabric is in.</description>
+    </property>
+
+    <!-- New Metrics system settings -->
+    <property>
+        <name>metrics.query.server.address</name>
+        <value>127.0.0.1</value>
+        <description>Host address where the metrics query server is started.</description>
+    </property>
+
+    <property>
+        <name>metrics.query.server.port</name>
+        <value>45005</value>
+        <description>Port for metrics query server to listen on.</description>
+    </property>
+
+    <property>
+        <name>metrics.data.table.retention.resolution.1.seconds</name>
+        <value>7200</value>
+        <description>Retention resolution 1 sec table in seconds.</description>
+    </property>
+
+    <!--
+        Logging Configuration
+    -->
+    <property>
+        <name>kafka.seed.brokers</name>
+        <value>127.0.0.1:9092</value>
+        <description>List of Kafka brokers (comma separated)</description>
+    </property>
+
+    <property>
+        <name>log.publish.num.partitions</name>
+        <value>1</value>
+        <description>Number of Kafka partitions to publish the logs to</description>
+    </property>
+
+    <property>
+        <name>log.run.account</name>
+        <value>continuuity</value>
+        <description>Account to run the logging service</description>
+    </property>
+
+    <property>
+        <name>log.base.dir</name>
+        <value>/tmp/logs/avro</value>
+        <description>Base log directory</description>
+    </property>
+
+    <property>
+        <name>log.retention.duration.days</name>
+        <value>7</value>
+        <description>Log file retention duration in days</description>
+    </property>
+
+    <property>
+        <name>log.file.rotation.interval.mins</name>
+        <value>1440</value>
+        <description>Log file rotation interval (for single node only)</description>
+    </property>
+
+    <!--
+        Kafka Configuration
+    -->
+    <property>
+        <name>kafka.bind.hostname</name>
+        <value>0.0.0.0</value>
+        <description>Kafka server hostname to bind to</description>
+    </property>
+
+    <property>
+        <name>kafka.port</name>
+        <value>9092</value>
+        <description>Kafka server port</description>
+    </property>
+
+    <property>
+        <name>kafka.num.partitions</name>
+        <value>1</value>
+        <description>Default number of partitions for a topic</description>
+    </property>
+
+    <property>
+        <name>kafka.log.dir</name>
+        <value>/tmp/kafka-logs</value>
+        <description>Directory to store Kafka logs</description>
+    </property>
+
+    <property>
+        <name>kafka.zookeeper.namespace</name>
+        <value>continuuity_kafka</value>
+        <description>ZK namespace for Kafka</description>
+    </property>
+
+    <property>
+        <name>kafka.default.replication.factor</name>
+        <value>1</value>
+        <description>Kafka replication factor</description>
+    </property>
+
+    <!--
+        Global Configuration.
+    -->
+    <property>
+        <name>enable.unrecoverable.reset</name>
+        <value>false</value>
+        <description>
+            WARNING! - Enabling this option enables the deletion of all applications and data.
+            No recovery is possible!
+        </description>
+    </property>
+
+
+</configuration>
