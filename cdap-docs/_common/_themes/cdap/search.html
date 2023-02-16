@@ -1,0 +1,54 @@
+{#
+    basic/search.html
+    ~~~~~~~~~~~~~~~~~
+
+    Template for the search page.
+
+    :copyright: Copyright 2007-2013 by the Sphinx team, see AUTHORS.
+    :license: BSD, see LICENSE for details.
+#}
+{%- extends "layout.html" %}
+{% set title = _('Search') %}
+{% set script_files = script_files + ['_static/searchtools.js'] %}
+{% block extrahead %}
+{# Hide extra navigation on search result page #}
+  <link rel="stylesheet" href="{{ pathto('_static/hide-nav.css', 1) }}" type="text/css" />
+  <script type="text/javascript">
+    jQuery(function() { Search.loadIndex("{{ pathto('searchindex.js', 1) }}"); });
+  </script>
+  {# this is used when loading the search index using $.ajax fails,
+     such as on Chrome for documents on localhost #}
+  <script type="text/javascript" id="searchindexloader"></script>
+  {{ super() }}
+{% endblock %}
+{% block body %}
+  <h1 id="search-documentation">{{ _('Search') }}</h1>
+  <div id="fallback" class="admonition warning">
+  <script type="text/javascript">$('#fallback').hide();</script>
+  <p>
+    {% trans %}Please activate JavaScript to enable the search
+    functionality.{% endtrans %}
+  </p>
+  </div>
+  <p>
+  From here you can search the documentation. 
+  </p>
+  <p>
+  To perform a <strong>Quick Search</strong>, enter your search word(s) into the box below and
+  click <strong>"Search"</strong>: 
+  </p>
+  <form name="searchQ" action="" method="get">
+    <input maxlength="256" size="40" type="text" name="q" value="" />
+    <input type="submit" value="{{ _('search') }}" />
+    <span id="search-progress" style="padding-left: 10px"></span>
+  </form>
+  <p>
+  <i>Quick Search</i> is a local keyword search; not as comprehensive as an external
+  search engine, but fast and often sufficiently accurate. Note that the Search function
+  will automatically search for all of the words. Pages containing fewer words won't
+  appear in the result list. Don't use any special characters (such as hyphens or periods)
+  in your words, as the search will then not work.
+  </p>
+  <div id="search-results">
+  </div>
+{% endblock %}
