@@ -1,0 +1,68 @@
+<!--
+  Copyright © 2016 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+<div class="run-level-information" ng-if="CanvasCtrl.currentRunIndex && CanvasCtrl.totalRuns">
+  <h3 class="run-number-container">
+    Run {{CanvasCtrl.currentRunIndex}} of {{CanvasCtrl.totalRuns}}
+  </h3>
+
+  <span>
+    <span
+      class="status-bubble"
+      ng-class="CanvasCtrl.currentRun.statusCssClass"
+    >
+    </span>
+    <strong ng-if="CanvasCtrl.currentRun.startTime">{{CanvasCtrl.currentRun.status}}</strong>
+    <strong ng-if="CanvasCtrl.currentRun.starting">Starting</strong>
+  </span>
+  <span>
+    <strong> Duration </strong>
+    <span ng-if="CanvasCtrl.currentRun.startTime">{{CanvasCtrl.currentRun.duration}}</span>
+    <span ng-if="!CanvasCtrl.currentRun.startTime">--</span>
+  </span>
+  <span>
+    <strong> Start Time </strong>
+    <span ng-if="CanvasCtrl.currentRun.startTime">{{CanvasCtrl.currentRun.startTime}}</span>
+    <span ng-if="!CanvasCtrl.currentRun.startTime">--</span>
+  </span>
+  <span>
+    <strong> Log Warnings: </strong>
+    <span ng-if="CanvasCtrl.currentRun.startTime">{{CanvasCtrl.logsMetrics['system.app.log.warn'] || '0'}}</span>
+    <span ng-if="!CanvasCtrl.currentRun.startTime">--</span>
+  </span>
+  <span>
+    <strong> Log Errors: </strong>
+    <span ng-if="CanvasCtrl.currentRun.startTime">{{CanvasCtrl.logsMetrics['system.app.log.error'] || '0'}}</span>
+    <span ng-if="!CanvasCtrl.currentRun.startTime">--</span>
+  </span>
+</div>
+
+<div class="run-level-information" ng-if="!CanvasCtrl.totalRuns">
+  <h3> Deployed </h3>
+</div>
+
+<my-dag-plus
+  data-is-disabled="true"
+  ng-class="{'canvas-scroll': CanvasCtrl.setScroll}"
+  context="CanvasCtrl"
+  template-popover="/assets/features/hydrator/templates/partial/schema-popover.html"
+  connection-popover-data="CanvasCtrl.generateSchemaOnEdge"
+  show-metrics="true"
+  metrics-data="CanvasCtrl.metrics"
+  node-popover-template="/assets/features/hydrator/templates/partial/metrics-popover.html"
+  disable-metrics-click="CanvasCtrl.totalRuns > 0 ? false : true"
+>
+</my-dag-plus>
