@@ -1,0 +1,62 @@
+#
+# Static variable used by both the build scripts and by the Sphinx Python build
+#
+
+COMMON="_common"
+COMMON_HTACCESS="$COMMON/htaccess"
+COMMON_IMAGES="$COMMON/_images"
+COMMON_SOURCE="$COMMON/_source"
+COMMON_CONF_PY="$COMMON/common_conf.py"
+COMMON_HIGHLEVEL_PY="$COMMON/highlevel_conf.py"
+COMMON_PLACEHOLDER="$COMMON/_source/placeholder_index._rst"
+HTACCESS="htaccess"
+
+ALL="all"
+DOCS="docs"
+DOCS_LOCAL="docs-local"
+DOCS_OUTER="docs-outer"
+GITHUB="github"
+GITHUB_ONLY="Github-only"
+WEB="web"
+WEB_ONLY="Web-only"
+WITH="with"
+WITHOUT="without"
+WITH_JAVADOCS="$WITHOUT"
+
+CDAP_MANUALS="introduction developers-manual admin-manual integrations examples-manual reference-manual faqs"
+EXTENSION_MANUALS="hydrator-manual tracker-manual"
+MANUALS="${CDAP_MANUALS} ${EXTENSION_MANUALS}"
+
+# Used to monitor any changes in scripts or commands for the building of Javadocs
+BUILD_RST="BUILD.rst"
+BUILD_RST_HASH_LOCATION="cdap-docs/vars"
+BUILD_RST_HASH="039fc5b9a1decc5c67f17c332413f5d9"
+
+#
+# These GIT_ variables are loaded by Sphinx build and need to be static as they are not sourced
+#
+
+# This needs to be explicitly set as Git has trouble identifying it
+GIT_BRANCH_PARENT="develop"
+
+# Used by admin-manual
+GIT_BRANCH_CDAP_SECURITY_EXTN="release/0.2"
+
+# Used by developers-manual
+GIT_BRANCH_CDAP_CLIENTS="1.2.0"
+GIT_BRANCH_CDAP_INGEST="1.3.0"
+
+GIT_BRANCH_CDAP_APPS="develop"
+# GIT_BRANCH_CDAP_APPS="release/cdap-4.0-compatible"
+GIT_VERSION_CDAP_APPS="0.7.0"
+
+# Used by integrations-manual
+GIT_BRANCH_CDAP_PACKS="develop"
+# GIT_BRANCH_CDAP_PACKS="release/cdap-4.0-compatible"
+
+# Used for building Hydrator documentation
+GIT_BRANCH_CASK_HYDRATOR="develop"
+# GIT_BRANCH_CASK_HYDRATOR="release/1.5"
+
+# Used for Tracker documentation
+GIT_BRANCH_CASK_TRACKER="release/0.2"
