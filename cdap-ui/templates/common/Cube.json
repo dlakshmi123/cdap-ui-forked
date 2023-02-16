@@ -1,0 +1,53 @@
+{
+  "id": "Cube",
+  "groups" : {
+    "position": [ "group1", "group2", "group3" ],
+    "group1": {
+      "display" : "General",
+      "position" : ["name"],
+      "fields": {
+        "name": {
+          "widget": "textbox",
+          "label" : "Name"
+        }
+      }
+    },
+
+    "group2" : {
+      "display" : "Cube Dataset Properties (if creating new dataset)",
+      "position" : [ "dataset.cube.resolutions", "dataset.cube.properties" ],
+      "fields" : {
+         "dataset.cube.resolutions" : {
+           "widget" : "csv",
+           "label" : "Cube Resolution",
+           "properties": {
+              "delimiter": ","
+           }
+         },
+         "dataset.cube.properties" : {
+           "widget" : "json-editor",
+           "label"  : "Other Dataset Properties"
+         }
+      }
+    },
+
+    "group3" : {
+      "display" : "CubeFact Mapping",
+      "position" : [ "cubeFact.timestamp.field", "cubeFact.timestamp.format", "cubeFact.measurements" ],
+      "fields" : {
+        "cubeFact.timestamp.field": {
+          "widget": "textbox",
+          "label" : "Timestamp Field"
+        },
+        "cubeFact.timestamp.format": {
+          "widget": "textbox",
+          "label" : "Timestamp Format"
+        },
+         "cubeFact.measurements" : {
+            "widget" : "json-editor",
+            "label" : "Measurements"
+         }
+      }
+    }
+  }
+}
