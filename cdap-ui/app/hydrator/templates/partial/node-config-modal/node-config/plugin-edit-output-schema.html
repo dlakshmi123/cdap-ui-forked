@@ -1,0 +1,101 @@
+<!--
+  Copyright © 2016-2017 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+<div class="output-schema" ng-init="watchproperty=HydratorPlusPlusNodeConfigCtrl.state.groupsConfig.outputSchema.schemaProperties['property-watch']">
+
+  <div class="schema-error">
+    <ul>
+      <li class="text-danger" ng-repeat="error in HydratorPlusPlusNodeConfigCtrl.state.errors">{{ error }}</li>
+    </ul>
+  </div>
+  <h4>
+    <span ng-if="!HydratorPlusPlusNodeConfigCtrl.state.isSink">Output Schema</span>
+    <span ng-if="HydratorPlusPlusNodeConfigCtrl.state.isSink">Schema</span>
+
+    <span class="fa fa-asterisk ng-scope" ng-if="HydratorPlusPlusNodeConfigCtrl.state.groupsConfig.outputSchema.isOutputSchemaRequired"></span>
+
+    <div class="pull-right" uib-dropdown>
+      <button class="btn btn-default" uib-dropdown-toggle>
+        <span>Actions</span>
+        <span class="fa fa-chevron-down"></span>
+      </button>
+
+      <ul class="output-schema-actions" uib-dropdown-menu>
+        <!-- If node is a sink and it's macro enabled -->
+        <li
+          ng-if="!isDisabled && HydratorPlusPlusNodeConfigCtrl.state.node._backendProperties['schema'] && HydratorPlusPlusNodeConfigCtrl.state.node._backendProperties['schema'].macroSupported"
+          ng-class="{'disabled': HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists}"
+          uib-tooltip="The dataset '{{HydratorPlusPlusNodeConfigCtrl.datasetId}}' already exists. Its schema cannot be modified."
+          tooltip-placement="top"
+          tooltip-enable="HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists"
+          tooltip-append-to-body="true">
+          <a href="" ng-click="HydratorPlusPlusNodeConfigCtrl.toggleAdvance()">Toggle Advanced</a>
+        </li>
+
+        <li
+          ng-if="(!HydratorPlusPlusNodeConfigCtrl.state.groupsConfig.outputSchema.implicitSchema && !isDisabled)"
+          ng-class="{'disabled': HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists || HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance}"
+          uib-tooltip-html="HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists ? 'The dataset \'' + HydratorPlusPlusNodeConfigCtrl.datasetId + '\' already exists. Its schema cannot be modified.' : HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance ? 'Importing a schema in Advanced mode is not supported' : ''"
+          tooltip-placement="top"
+          tooltip-enable="HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists || HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance"
+          tooltip-append-to-body="true">
+          <a href="#" onclick="document.getElementById('schema-import-link').click()">Import</a>
+        </li>
+        <li
+          ng-class="{'disabled': HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance}"
+          uib-tooltip="Exporting a schema in Advanced mode is not supported"
+          tooltip-placement="top"
+          tooltip-enable="HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance"
+          tooltip-append-to-body="true">
+          <a href="" ng-click="HydratorPlusPlusNodeConfigCtrl.exportSchema()">Export</a>
+        </li>
+        <li ng-if="!isDisabled && !HydratorPlusPlusNodeConfigCtrl.state.isSink">
+          <a href="" ng-click="HydratorPlusPlusNodeConfigCtrl.showPropagateConfirm = true">Propagate</a>
+        </li>
+        <li
+          ng-if="(!HydratorPlusPlusNodeConfigCtrl.state.groupsConfig.outputSchema.implicitSchema && !isDisabled)"
+          ng-class="{'disabled': HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists || HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance}"
+          uib-tooltip-html="HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists ? 'The dataset \'' + HydratorPlusPlusNodeConfigCtrl.datasetId + '\' already exists. Its schema cannot be cleared.' : HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance ? 'Clearing a schema in Advanced mode is not supported' : ''"
+          tooltip-placement="top"
+          tooltip-enable="HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists || HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance"
+          tooltip-append-to-body="true">
+          <a href="" ng-click="HydratorPlusPlusNodeConfigCtrl.schemaClear()">Clear</a>
+        </li>
+      </ul>
+    </div>
+  </h4>
+  <fieldset class="clearfix" ng-disabled="isDisabled">
+    <div class="schema-propagation-confirm">
+      <div class="well well-xs" ng-if="HydratorPlusPlusNodeConfigCtrl.showPropagateConfirm">
+        Existing schema will be over-written. Continue?
+        <div class="row confirmation-button">
+          <button ng-click="HydratorPlusPlusNodeConfigCtrl.propagateSchemaDownStream(); HydratorPlusPlusNodeConfigCtrl.showPropagateConfirm=false;" class="btn btn-default">Yes</button>
+          <button ng-click="HydratorPlusPlusNodeConfigCtrl.showPropagateConfirm = false" class="btn btn-default">No</button>
+        </div>
+      </div>
+    </div>
+    <my-output-schema
+      schema-advance="HydratorPlusPlusNodeConfigCtrl.state.schemaAdvance"
+      node="HydratorPlusPlusNodeConfigCtrl.state.node"
+      groups-config="HydratorPlusPlusNodeConfigCtrl.state.groupsConfig"
+      update-default-output-schema="HydratorPlusPlusNodeConfigCtrl.updateDefaultOutputSchema(outputSchema)"
+      is-disabled="isDisabled || HydratorPlusPlusNodeConfigCtrl.datasetAlreadyExists">
+    </my-output-schema>
+  </fieldset>
+</div>
+
+<my-file-select class="sr-only" id="schema-import-link" data-button-icon="fa-upload" on-file-select="HydratorPlusPlusNodeConfigCtrl.importFiles($files)" data-button-label="Import">
+</my-file-select>
