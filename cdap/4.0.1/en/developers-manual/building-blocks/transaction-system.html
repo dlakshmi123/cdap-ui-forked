@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KWLFGH');</script>
+    <!-- End Google Tag Manager -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="Cask Data, Inc." name="author" />
+<meta content="Copyright © 2014-2016 Cask Data, Inc." name="copyright" />
+
+    
+    
+    <meta name="git_release" content="4.0.1">
+    <meta name="git_hash" content="30d9a378abb0077df4e0e30cb9c66712c5ec6714">
+    <meta name="git_timestamp" content="2017-01-24 18:22:27 -0600">
+    <title>Transaction System &mdash; Cask Data Application Platform 4.0.1 Documentation</title>
+
+    <link rel="canonical" href="http://docs.cask.co/cdap/4.0.1/en/developers-manual/building-blocks/transaction-system.html">
+
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/annotator.min.css" type="text/css" />
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/copy-to-clipboard.js"></script>
+    <script type="text/javascript" src="../_static/tabbed-parsed-literal.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Cask Data Application Platform 4.0.1 Documentation" href="../index.html" />
+    <link rel="up" title="Building Blocks" href="index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="mapreduce-jobs.html" />
+    <link rel="prev" title="Namespaces" href="namespaces.html" /> 
+  </head>
+  <body role="document">
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWLFGH"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="mapreduce-jobs.html" title="&lt;no title&gt;"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="namespaces.html" title="Namespaces"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/cdap/json-versions.js"/></script>
+        <script>window.setVersion('4.0.1');</script>
+       
+        <li><a href="../table-of-contents.html">Developers’ Manual</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Building Blocks</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div id="documentwrapper" class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="transaction-system">
+<span id="id1"></span><h1><a class="headerlink" href="#transaction-system" title="Perma-link to this heading">🔗</a>Transaction System</h1>
+<div class="section" id="the-need-for-transactions">
+<h2><a class="headerlink" href="#the-need-for-transactions" title="Perma-link to this heading">🔗</a>The Need for Transactions</h2>
+<p>A flowlet processes the data objects received on its inputs one at a time. While processing
+a single input object, all operations, including the removal of the data from the input,
+and emission of data to the outputs, are executed in a <em>transaction</em>. This provides us
+with ACID—atomicity, consistency, isolation, and durability properties:</p>
+<ul class="simple">
+<li>The process method runs under read isolation to ensure that it does not see dirty writes
+(uncommitted writes from concurrent processing) in any of its reads.
+It does see, however, its own writes.</li>
+<li>A failed attempt to process an input object leaves the data in a consistent state;
+it does not leave partial writes behind.</li>
+<li>All writes and emission of data are committed atomically;
+either all of them or none of them are persisted.</li>
+<li>After processing completes successfully, all its writes are persisted in a durable way.</li>
+</ul>
+<p>In case of failure, the state of the data is unchanged and processing of the input
+object can be reattempted. This ensures &quot;exactly-once&quot; processing of each object.</p>
+</div>
+<div class="section" id="occ-optimistic-concurrency-control">
+<h2><a class="headerlink" href="#occ-optimistic-concurrency-control" title="Perma-link to this heading">🔗</a>OCC: Optimistic Concurrency Control</h2>
+<p>The Cask Data Application Platform uses <a class="reference external" href="http://tephra.incubator.apache.org">Apache Tephra™</a>,
+which uses <em>Optimistic Concurrency Control</em> (OCC) to implement transactions. Unlike most relational
+databases that use locks to prevent conflicting operations between transactions, under OCC
+we allow these conflicting writes to happen. When the transaction is committed, we can
+detect whether it has any conflicts: namely, if during the lifetime of the transaction,
+another transaction committed a write for one of the same keys that the transaction has
+written. In that case, the transaction is aborted and all of its writes are rolled back.</p>
+<p>In other words: If two overlapping transactions modify the same row, then the transaction
+that commits first will succeed, but the transaction that commits last is rolled back due
+to a write conflict.</p>
+<p>Optimistic Concurrency Control is lockless and therefore avoids problems such as idle
+processes waiting for locks, or even worse, deadlocks. However, it comes at the cost of
+rollback in case of write conflicts. We can only achieve high throughput with OCC if the
+number of conflicts is small. It is therefore good practice to reduce the probability of
+conflicts wherever possible.</p>
+<p>Here are some rules to follow for flows, flowlets, and services:</p>
+<ul class="simple">
+<li>Keep transactions short. The Cask Data Application Platform attempts to delay the beginning of each
+transaction as long as possible. For instance, if your flowlet only performs write
+operations, but no read operations, then all writes are deferred until the process
+method returns. They are then performed and transacted, together with the
+removal of the processed object from the input, in a single batch execution.
+This minimizes the duration of the transaction.</li>
+<li>However, if your flowlet performs a read, then the transaction must
+begin at the time of the read. If your flowlet performs long-running
+computations after that read, then the transaction runs longer, too,
+and the risk of conflicts increases. It is therefore good practice
+to perform reads as late in the process method as possible.</li>
+<li>There are two ways to perform an increment: As a write operation that
+returns nothing, or as a read-write operation that returns the incremented
+value. If you perform the read-write operation, then that forces the
+transaction to begin, and the chance of conflict increases. Unless you
+depend on that return value, you should always perform an increment
+only as a write operation.</li>
+<li>Use hash-based partitioning for the inputs of highly concurrent flowlets
+that perform writes. This helps reduce concurrent writes to the same
+key from different instances of the flowlet.</li>
+</ul>
+<p>Keeping these guidelines in mind will help you write more efficient and faster-performing
+code.</p>
+</div>
+<div class="section" id="using-transactions-in-programs">
+<span id="transaction-system-using-in-programs"></span><h2><a class="headerlink" href="#using-transactions-in-programs" title="Perma-link to this heading">🔗</a>Using Transactions in Programs</h2>
+<p>CDAP provides transactional capabilities to help ensure consistency of data under highly
+concurrent workloads. To make transactions easy to use, CDAP will often implicitly execute
+application code inside a transaction—and retry the execution if the transaction fails
+due to write conflicts.</p>
+<p>For example, to guarantee exactly-once processing semantics for flows, the process method
+of a flowlet is always run inside a transaction. This transaction encapsulates the removal
+of data from an input queue, all data operations performed in the course of processing
+this data, and the emitting of data to its output queues for downstream flowlets. All of
+these must be together in the same transaction and committed atomically: otherwise,
+exactly-once processing cannot be ensured.</p>
+<p>For other types of programs, transactions can also be useful. For example, the handler
+methods of services are executed transactionally to make sure they operate on consistent
+data. The lifecycle methods (<code class="docutils literal"><span class="pre">initialize()</span></code> and <code class="docutils literal"><span class="pre">destroy()</span></code>) of all programs are also executed
+within an implicit transaction.</p>
+<p>However, there are use cases where that transaction is not desired:</p>
+<ul class="simple">
+<li>The default transaction timeout (as <a class="reference external" href="../source/../../admin-manual/appendices/cdap-site.html#appendix-cdap-default-datasets" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">configured by</span></a> <code class="docutils literal"><span class="pre">data.tx.timeout</span></code> in <code class="docutils literal"><span class="pre">cdap-site.xml</span></code>) may be too
+short for the operations performed by a method. For example, the <code class="docutils literal"><span class="pre">destroy()</span></code> method of a
+MapReduce program may have to clean up temporary data, or make a web service call to
+notify some other party of the job completion.</li>
+<li>A method does not perform any transactional operations. For example, FileSet datasets do
+not require a transaction—a method using only FileSets therefore does not require an
+implicit transaction.</li>
+<li>A method performs many operations and wishes to execute them in several short
+transactions rather than a single long transaction. A good example of such a method is the
+<code class="docutils literal"><span class="pre">run()</span></code> method of a worker, which runs perpetually and cannot be executed inside a single
+transaction. Instead, it needs to start an explicit transaction whenever it performs
+operations on transactional datasets.</li>
+</ul>
+<p>To facilitate these use cases, CDAP offers programs control over the execution of
+transactions:</p>
+<ul class="simple">
+<li>Annotate a method with an <code class="docutils literal"><span class="pre">&#64;TransactionPolicy</span></code> to turn off the implicit transaction
+started by CDAP.</li>
+<li>Use the program context’s <code class="docutils literal"><span class="pre">execute()</span></code> method to run a block of code inside an explicit
+transaction.</li>
+<li>Control the timeout of transactions by setting a system-wide configuration
+(<code class="docutils literal"><span class="pre">data.tx.timeout</span></code>); by setting a preference for an individual namespace, application, or
+program; or by passing a timeout for the transaction to the <code class="docutils literal"><span class="pre">execute()</span></code> method.</li>
+</ul>
+<div class="section" id="implicit-versus-explicit-transactions">
+<h3><a class="headerlink" href="#implicit-versus-explicit-transactions" title="Perma-link to this heading">🔗</a>Implicit versus Explicit Transactions</h3>
+<p>By default, CDAP will start an implicit transaction for these methods:</p>
+<ul class="simple">
+<li>All flowlet process methods</li>
+<li>All service handler methods</li>
+<li>The <code class="docutils literal"><span class="pre">ProgramLifecycle</span></code> methods (<code class="docutils literal"><span class="pre">initialize()</span></code> and <code class="docutils literal"><span class="pre">destroy()</span></code>) for all types of
+programs and sub-programs (flowlets, service handlers, and workflow actions), with the
+exception of worker programs.</li>
+</ul>
+<p>For example, as shown in the <a class="reference external" href="../source/../../examples-manual/examples/hello-world.html#examples-hello-world" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">HelloWorld example</span></a>, the
+<code class="docutils literal"><span class="pre">GreetingHandler</span></code> uses the <em>whom</em> <code class="docutils literal"><span class="pre">KeyValueTable</span></code>. CDAP implicitly starts a
+transaction for this handler method, and the handler can rely on the transactional
+consistency of the data it reads from the dataset:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">GreetingHandler</span> <span class="kd">extends</span> <span class="n">AbstractHttpServiceHandler</span> <span class="o">{</span>
+
+  <span class="nd">@UseDataSet</span><span class="o">(</span><span class="s">&quot;whom&quot;</span><span class="o">)</span>
+  <span class="kd">private</span> <span class="n">KeyValueTable</span> <span class="n">whom</span><span class="o">;</span>
+
+  <span class="kd">private</span> <span class="n">Metrics</span> <span class="n">metrics</span><span class="o">;</span>
+
+  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;greet&quot;</span><span class="o">)</span>
+  <span class="nd">@GET</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">greet</span><span class="o">(</span><span class="n">HttpServiceRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServiceResponder</span> <span class="n">responder</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">byte</span><span class="o">[]</span> <span class="n">name</span> <span class="o">=</span> <span class="n">whom</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">NameSaver</span><span class="o">.</span><span class="na">NAME</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">toGreet</span> <span class="o">=</span> <span class="n">name</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">Charsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">)</span> <span class="o">:</span> <span class="s">&quot;World&quot;</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">toGreet</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;Jane Doe&quot;</span><span class="o">))</span> <span class="o">{</span>
+      <span class="n">metrics</span><span class="o">.</span><span class="na">count</span><span class="o">(</span><span class="s">&quot;greetings.count.jane_doe&quot;</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="n">responder</span><span class="o">.</span><span class="na">sendString</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;Hello %s!&quot;</span><span class="o">,</span> <span class="n">toGreet</span><span class="o">));</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>For flowlet process methods, this starting of implicit transactions cannot be disabled,
+because that would impact the semantics of flow execution.</p>
+<p>For MapReduce programs, the lifecycle methods of MapReduce tasks (mappers and reducers)
+and MapReduce helpers (such as partitioners and comparators) are always run inside a
+transaction: the long-running transaction that encapsulates an entire MapReduce job (see
+<a class="reference internal" href="mapreduce-programs.html#mapreduce-transactions"><span>MapReduce and Transactions</span></a>).</p>
+<p>For Spark programs, see <a class="reference internal" href="spark-programs.html#spark-transactions"><span>Transactions and Spark</span></a> for using
+transactions in Spark programs.</p>
+<p>For all other lifecycle methods and for service handlers, the implicit transaction can be
+turned off by annotating the method with <code class="docutils literal"><span class="pre">&#64;TransactionPolicy(TransactionControl.EXPLICIT)</span></code>.</p>
+<p>For example, in the <code class="docutils literal"><span class="pre">FileSetService</span></code> of the <a class="reference external" href="../source/../../examples-manual/examples/fileset-example.html#examples-fileset" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">FileSetExample</span></a>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nd">@GET</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;{fileset}&quot;</span><span class="o">)</span>
+<span class="nd">@TransactionPolicy</span><span class="o">(</span><span class="n">TransactionControl</span><span class="o">.</span><span class="na">EXPLICIT</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">read</span><span class="o">(</span><span class="n">HttpServiceRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServiceResponder</span> <span class="n">responder</span><span class="o">,</span>
+                 <span class="nd">@PathParam</span><span class="o">(</span><span class="s">&quot;fileset&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">set</span><span class="o">,</span> <span class="nd">@QueryParam</span><span class="o">(</span><span class="s">&quot;path&quot;</span><span class="o">)</span> <span class="n">String</span> <span class="n">filePath</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">.</span> <span class="o">.</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>This service handler method only accesses FileSets, which do not require transactions.
+Therefore, we can safely turn off the implicit transaction for this method.</p>
+<p>Note that you can access any dataset through the program context’s <code class="docutils literal"><span class="pre">getDataset()</span></code> method.
+However, if you attempt to perform an operation on a transactional dataset (such as a
+Table) without a transaction, that operation will fail with an exception.</p>
+<p>For the lifecycle methods of a worker, CDAP does not (by default) start an implicit
+transaction. In a similar fashion as above, that can be changed by annotating the
+lifecycle method <code class="docutils literal"><span class="pre">initialize()</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nd">@Override</span>
+<span class="nd">@TransactionPolicy</span><span class="o">(</span><span class="n">TransactionControl</span><span class="o">.</span><span class="na">IMPLICIT</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="o">(</span><span class="n">WorkerContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+<p>This method will now run inside an implicit transaction.</p>
+<p>Note that you cannot annotate the <code class="docutils literal"><span class="pre">run()</span></code> method of a worker of a custom workflow action
+with implicit transaction control; they are always executed without an implicit
+transaction and must start transactions explicitly when needed. This is described in the
+next section.</p>
+</div>
+<div class="section" id="explicit-transactions">
+<h3><a class="headerlink" href="#explicit-transactions" title="Perma-link to this heading">🔗</a>Explicit Transactions</h3>
+<p>Every program context (except for the <code class="docutils literal"><span class="pre">FlowletContext</span></code> and the <code class="docutils literal"><span class="pre">MapReduceTaskContext</span></code>)
+allows the executing of a block of code in an explicit transaction.</p>
+<p>For example, this service handler method (from the <code class="docutils literal"><span class="pre">UploadService</span></code> of the
+<a class="reference external" href="../source/../../examples-manual/examples/sport-results.html#examples-sport-results" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">SportResultsExample</span></a>) uses an explicit transaction to
+access the partition metadata, whereas the streaming of the file contents to the client is
+performed outside the transaction:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nd">@GET</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;leagues/{league}/seasons/{season}&quot;</span><span class="o">)</span>
+<span class="nd">@TransactionPolicy</span><span class="o">(</span><span class="n">TransactionControl</span><span class="o">.</span><span class="na">EXPLICIT</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">read</span><span class="o">(</span><span class="n">HttpServiceRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServiceResponder</span> <span class="n">responder</span><span class="o">,</span>
+                 <span class="nd">@PathParam</span><span class="o">(</span><span class="s">&quot;league&quot;</span><span class="o">)</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">league</span><span class="o">,</span>
+                 <span class="nd">@PathParam</span><span class="o">(</span><span class="s">&quot;season&quot;</span><span class="o">)</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">season</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">TransactionFailureException</span> <span class="o">{</span>
+
+  <span class="kd">final</span> <span class="n">PartitionKey</span> <span class="n">key</span> <span class="o">=</span> <span class="n">PartitionKey</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">addStringField</span><span class="o">(</span><span class="s">&quot;league&quot;</span><span class="o">,</span> <span class="n">league</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">addIntField</span><span class="o">(</span><span class="s">&quot;season&quot;</span><span class="o">,</span> <span class="n">season</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+  <span class="kd">final</span> <span class="n">AtomicReference</span><span class="o">&lt;</span><span class="n">PartitionDetail</span><span class="o">&gt;</span> <span class="n">partitionDetail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+  <span class="n">getContext</span><span class="o">().</span><span class="na">execute</span><span class="o">(</span><span class="k">new</span> <span class="n">TxRunnable</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">DatasetContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+      <span class="n">partitionDetail</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">results</span><span class="o">.</span><span class="na">getPartition</span><span class="o">(</span><span class="n">key</span><span class="o">));</span>
+    <span class="o">}</span>
+  <span class="o">});</span>
+  <span class="k">if</span> <span class="o">(</span><span class="n">partitionDetail</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">responder</span><span class="o">.</span><span class="na">sendString</span><span class="o">(</span><span class="mi">404</span><span class="o">,</span> <span class="s">&quot;Partition not found.&quot;</span><span class="o">,</span> <span class="n">Charsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">);</span>
+    <span class="k">return</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="n">responder</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="mi">200</span><span class="o">,</span> <span class="n">partitionDetail</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getLocation</span><span class="o">().</span><span class="na">append</span><span class="o">(</span><span class="s">&quot;file&quot;</span><span class="o">),</span> <span class="s">&quot;text/plain&quot;</span><span class="o">);</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">responder</span><span class="o">.</span><span class="na">sendError</span><span class="o">(</span><span class="mi">400</span><span class="o">,</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;Unable to read path &#39;%s&#39;&quot;</span><span class="o">,</span> <span class="n">partitionDetail</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getRelativePath</span><span class="o">()));</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Be aware that you cannot nest transactions. For example, either:</p>
+<ul class="simple">
+<li>calling <code class="docutils literal"><span class="pre">execute()</span></code> from a method that already runs inside an implicit transaction; or</li>
+<li>calling <code class="docutils literal"><span class="pre">execute()</span></code> from the <code class="docutils literal"><span class="pre">run()</span></code> method of a <code class="docutils literal"><span class="pre">TxRunnable</span></code></li>
+</ul>
+<p>would fail with an exception.</p>
+</div>
+<div class="section" id="controlling-the-transaction-timeout">
+<h3><a class="headerlink" href="#controlling-the-transaction-timeout" title="Perma-link to this heading">🔗</a>Controlling the Transaction Timeout</h3>
+<p>By default, all transactions are executed with the same transaction timeout. This timeout
+is <a class="reference external" href="../source/../../admin-manual/appendices/cdap-site.html#appendix-cdap-default-datasets" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">configured site-wide</span></a> as <code class="docutils literal"><span class="pre">data.tx.timeout</span></code>
+(default value 30 seconds) in <code class="docutils literal"><span class="pre">cdap-site.xml</span></code>. You can change it to a higher number of
+seconds if your transactions typically require a longer timeout.</p>
+<p>To control the transaction timeout for individual namespaces, applications, or programs,
+you can <a class="reference external" href="../source/../../admin-manual/operations/preferences.html#preferences" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">set a preference</span></a> for the namespace, application, or program.
+The name of the preference is <code class="docutils literal"><span class="pre">system.data.tx.timeout</span></code>.</p>
+<p>To configure the timeout for a sub-program (a flowlet or a custom workflow action), prefix
+the preference name with <code class="docutils literal"><span class="pre">flowlet.&lt;name&gt;</span></code> or <code class="docutils literal"><span class="pre">action.&lt;name&gt;</span></code>. For example, setting
+<code class="docutils literal"><span class="pre">flowlet.aggregator.system.data.tx.timeout</span></code> to 60 seconds will only affect the flowlet
+named <em>aggregator</em> but not the other flowlets of the flow.</p>
+<p>To control the transaction timeout for an individual run of a program, you can also
+provide this setting as a runtime argument when starting the program. Note that this will
+<a class="reference external" href="../source/../../admin-manual/operations/preferences.html#preferences-order-of" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">prevail over a preference</span></a> configured for the namespace,
+application, or program.</p>
+<p>Finally, for explicit transactions, you can control the transaction timeout by passing in
+the timeout in seconds to the <code class="docutils literal"><span class="pre">execute()</span></code> method:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">getContext</span><span class="o">().</span><span class="na">execute</span><span class="o">(</span><span class="mi">90</span><span class="o">,</span> <span class="k">new</span> <span class="n">TxRunnable</span><span class="o">()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">DatasetContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="o">...</span>
+  <span class="o">}</span>
+<span class="o">});</span>
+</pre></div>
+</div>
+<p>This will execute the <code class="docutils literal"><span class="pre">TxRunnable</span></code> in a transaction with a timeout of 90 seconds.</p>
+</div>
+</div>
+<div class="section" id="levels-of-conflict-detection">
+<span id="transaction-system-conflict-detection"></span><h2><a class="headerlink" href="#levels-of-conflict-detection" title="Perma-link to this heading">🔗</a>Levels of Conflict Detection</h2>
+<p>Transactions providing ACID (atomicity, consistency, isolation, and durability) guarantees
+are useful in several applications where data accuracy is critical—examples include billing
+applications and computing click-through rates.</p>
+<p>However, transaction are not for free: the transaction system must track all the writes
+made by all transactions, and it must check transactions for conflicts before committing them.
+If conflicts are frequent, they will impact performance because the failed transactions
+have to be rolled back and reattempted.</p>
+<p>In some scenarios, you may want to fine-tune the manner in which a dataset participates in
+transactions:</p>
+<ul class="simple">
+<li>Some applications—such as trending—might not need transactions for all writes, because
+small inaccuracies have little effect on trends with great momentum. Applications that
+do not strictly require accuracy can trade it for increased throughput by disabling
+transactions for some datasets.</li>
+<li>Some applications perform concurrent updates to the same row of a table, but typically
+those updates do not strictly conflict with each other because they are on different
+columns of the row. In this case it can make sense to increase the precision of conflict
+detection by tracking changes at the column level instead of the row level.</li>
+</ul>
+<p>Both of these can be achieved by specifying a conflict detection level when the table is
+created. For example, in your application's <code class="docutils literal"><span class="pre">configure()</span></code> method:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">Tables</span><span class="o">.</span><span class="na">createTable</span><span class="o">(</span><span class="n">getConfigurer</span><span class="o">(),</span> <span class="s">&quot;myTable&quot;</span><span class="o">,</span> <span class="n">ConflictDetection</span><span class="o">.</span><span class="na">COLUMN</span><span class="o">);</span>
+</pre></div>
+</div>
+<p>You have these options:</p>
+<ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">ConflictDetection.NONE</span></code> to disable transactions for the table. None of the writes
+performed on this table will participate in conflict detection. However, all writes
+will still be rolled back in case of a transaction failure (the transaction may fail
+for other reasons than a conflict on this table).</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">ConflictDetection.ROW</span></code> to track writes at the row level. This means that two
+concurrent transactions will cause a conflict if they write to the same row of the table,
+even if the writes are for different columns. This is the default.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">ConflictDetection.COLUMN</span></code> to increase the precision of the conflict detection to
+the column level: Two concurrent transactions can write to the same row without conflict,
+as long as they write to disjoint sets of columns. This will increase the overhead for
+each transaction, because the transaction system must track writes with greater detail.
+But it can also greatly reduce the number of transaction conflicts, leading to improved
+overall application throughput.</p>
+<p>See the <a class="reference external" href="../source/../../examples-manual/examples/user-profiles.html#examples-user-profiles" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">UserProfile example</span></a>
+for a sample use case.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="transaction-examples">
+<h2><a class="headerlink" href="#transaction-examples" title="Perma-link to this heading">🔗</a>Transaction Examples</h2>
+<ul class="simple">
+<li>For an example of using <strong>implicit transactions,</strong> see the <a class="reference external" href="../source/../../examples-manual/examples/hello-world.html#examples-hello-world" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">HelloWorld example</span></a> and its <code class="docutils literal"><span class="pre">Greeting</span></code> service and <code class="docutils literal"><span class="pre">GreetingHandler</span></code>, which uses
+implicit transactions.</li>
+<li>For an example of using <strong>explicit transactions,</strong> see the <a class="reference external" href="../source/../../examples-manual/examples/fileset-example.html#examples-fileset" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">FileSet example</span></a> and its <code class="docutils literal"><span class="pre">FileSetService</span></code>, whose <code class="docutils literal"><span class="pre">FileSetHandler</span></code> uses explicit
+transactions for all of its operations.</li>
+<li>For another example of using <strong>explicit transactions,</strong> see the
+<a class="reference external" href="../source/../../examples-manual/examples/sport-results.html#examples-sport-results" title="(in Cask Data Application Platform v4.0.1)"><span class="xref std std-ref">Sport Results example</span></a>, where the service
+<code class="docutils literal"><span class="pre">UploadService</span></code> has an <code class="docutils literal"><span class="pre">UploadHandler</span></code> that reads and writes using explicit
+transactions.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  <div role="note" aria-label="manuals links">
+    <h3><a href="../table-of-contents/../../index.html" rel="nofollow">CDAP Documentation v4.0.1</a></h3>
+    
+    <ul class="this-page-menu">
+      <li><div class=""></div><a href="../table-of-contents/../../introduction/index.html" rel="nofollow">Introduction to CDAP</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../developers-manual/index.html" rel="nofollow">Developers’ Manual</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../admin-manual/index.html" rel="nofollow">Administration Manual</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../integrations/index.html" rel="nofollow">Integrations</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../examples-manual/index.html" rel="nofollow">Examples, Guides, and Tutorials</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/index.html" rel="nofollow">Reference Manual</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../faqs/index.html" rel="nofollow">FAQs</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/release-notes.html" rel="nofollow">Release Notes</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/glossary.html" rel="nofollow">Glossary</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../search.html" rel="nofollow">Search</a></li>
+    </ul>
+    <h3 class="cdap-extensions">CDAP Extensions</h3>
+    
+    <ul class="this-page-menu">
+      <li><div class=""></div><a href="../table-of-contents/../../hydrator-manual/index.html" rel="nofollow">Cask Hydrator</a></li>
+      <li><div class=""></div><a href="../table-of-contents/../../tracker-manual/index.html" rel="nofollow">Cask Tracker</a></li>
+    </ul>
+  </div>
+    
+  <h3 class="pagenavtitle"><a href="../table-of-contents.html">Developers’ Manual: Table&nbsp;of&nbsp;Contents</a></h3>
+    <nav class="pagenav">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html"> Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html"> Getting Started Developing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html"> Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html"> Building Blocks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html"> Core Abstractions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications.html"> Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="streams.html"> Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/index.html"> Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="views.html"> Views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows-flowlets/index.html"> Flows and Flowlets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mapreduce-programs.html"> MapReduce Programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html"> Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schedules.html"> Schedules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secure-keys.html"> Secure Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="services.html"> Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spark-programs.html"> Spark Programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workers.html"> Workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html"> Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="artifacts.html"> Artifacts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="program-lifecycle.html"> Program Lifecycle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata-lineage.html"> Metadata and Lineage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audit-logging.html"> Audit Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html"> Namespaces</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href=""> Transaction System</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-need-for-transactions">The Need for Transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#occ-optimistic-concurrency-control">OCC: Optimistic Concurrency Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-transactions-in-programs">Using Transactions in Programs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#implicit-versus-explicit-transactions">Implicit versus Explicit Transactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#explicit-transactions">Explicit Transactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#controlling-the-transaction-timeout">Controlling the Transaction Timeout</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#levels-of-conflict-detection">Levels of Conflict Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transaction-examples">Transaction Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../security/index.html"> Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html"> Testing and Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ingesting-tools/index.html"> Ingesting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data-exploration/index.html"> Data Exploration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html"> Advanced Topics</a></li>
+</ul>
+ 
+    </nav>
+  
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/cdap/4.0.1/cdap-docs-4.0.1-web.zip"
+            rel="nofollow">Zip Archive of CDAP Documentation</a></li>
+    </ul>
+   </div>
+<div role="note" aria-label="other links">
+    <h3><a href="http://docs.cask.co/" target="_blank">Documentation</a></h3>
+    <ul class="this-page-menu">
+        <li><a href="http://docs.cask.co/cdap/index.html" target="_blank">CDAP</a></li>
+        <li><a href="http://docs.cask.co/coopr/index.html" target="_blank">Coopr</a></li>
+        <li><a href="http://docs.cask.co/tigon/index.html" target="_blank">Tigon</a></li>
+    </ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Namespaces" href="namespaces.html" />Namespaces</a>&nbsp;&nbsp;
+    </th>
+    
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2017 Cask Data, Inc.
+      &bull; Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="&lt;no title&gt;" href="mapreduce-jobs.html" />&lt;no title&gt;</a>
+    </th>
+
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="robots" content="noindex, nofollow">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta content="Cask Data, Inc." name="author" />
+<meta content="Cask Data Application Platform Hello World Example" name="description" />
+<meta content="Copyright © 2014 Cask Data, Inc." name="copyright" />
+<script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+    <meta name="git_release" content="3.1.2">
+    <meta name="git_hash" content="8504ea7980b480742f7ee2846b95741452160579">
+    <meta name="git_timestamp" content="2015-09-04 12:16:13 -0700">
+    <title>Hello World &mdash; Cask Data Application Platform 3.1.2 Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+
+
+
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '3.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Cask Data Application Platform 3.1.2 Documentation" href="../index.html" />
+    <link rel="up" title="Examples" href="index.html" />
+    <link rel="next" title="Count Random" href="count-random.html" />
+    <link rel="prev" title="Examples" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="count-random.html" title="Count Random"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Examples"
+             accesskey="P">Previous</a> |</li>
+        
+        <script type="text/javascript" src="../_static/version-menu.js"></script>
+        <script src="http://docs.cask.co/cdap/json-versions.js"/></script>
+        <script>window.setVersion('3.1.2');</script>
+       
+        <li><a href="../table-of-contents.html">CDAP Examples, Guides, and Tutorials</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Examples</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hello-world">
+<span id="examples-hello-world"></span><h1>Hello World<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h1>
+<p>The simplest Cask Data Application Platform (CDAP) example.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This application uses one stream, one dataset, one flow and one service to implement the classic &#8220;Hello World&#8221;:</p>
+<ul class="simple">
+<li>A stream to send names to;</li>
+<li>A flow with a single flowlet that reads the stream and stores in a dataset each name in a KeyValueTable; and</li>
+<li>A service that reads the name from the KeyValueTable and responds with &#8220;Hello [Name]!&#8221;</li>
+</ul>
+<div class="section" id="the-helloworld-application">
+<h3>The <code class="docutils literal"><span class="pre">HelloWorld</span></code> Application<a class="headerlink" href="#the-helloworld-application" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-java"><div class="highlight"><pre> * This is a simple HelloWorld example that uses one stream, one dataset, one flow and one service.
+ * &lt;uL&gt;
+ *   &lt;li&gt;A stream to send names to.&lt;/li&gt;
+ *   &lt;li&gt;A flow with a single flowlet that reads the stream and stores each name in a KeyValueTable&lt;/li&gt;
+ *   &lt;li&gt;A service that reads the name from the KeyValueTable and responds with &#39;Hello [Name]!&#39;&lt;/li&gt;
+ * &lt;/uL&gt;
+ */
+public class HelloWorld extends AbstractApplication {
+
+  @Override
+  public void configure() {
+    setName(&quot;HelloWorld&quot;);
+    setDescription(&quot;A Hello World program for the Cask Data Application Platform&quot;);
+    addStream(new Stream(&quot;who&quot;));
+    createDataset(&quot;whom&quot;, KeyValueTable.class);
+    addFlow(new WhoFlow());
+    addService(new Greeting());
+  }
+</pre></div>
+</div>
+<p>The application uses a stream called <em>who</em> to ingest data through a flow <em>WhoFlow</em> to a dataset <em>whom</em>.</p>
+</div>
+<div class="section" id="the-whoflow">
+<h3>The <code class="docutils literal"><span class="pre">WhoFlow</span></code><a class="headerlink" href="#the-whoflow" title="Permalink to this headline">¶</a></h3>
+<p>This is a trivial flow with a single flowlet named <em>saver</em> of type <code class="docutils literal"><span class="pre">NameSaver</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre>    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configureFlow</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">setName</span><span class="o">(</span><span class="s">&quot;WhoFlow&quot;</span><span class="o">);</span>
+      <span class="n">setDescription</span><span class="o">(</span><span class="s">&quot;A flow that collects names&quot;</span><span class="o">);</span>
+      <span class="n">addFlowlet</span><span class="o">(</span><span class="s">&quot;saver&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">NameSaver</span><span class="o">());</span>
+      <span class="n">connectStream</span><span class="o">(</span><span class="s">&quot;who&quot;</span><span class="o">,</span> <span class="s">&quot;saver&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="o">/**</span>
+   <span class="o">*</span> <span class="n">Sample</span> <span class="n">Flowlet</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>The flowlet uses a dataset of type <code class="docutils literal"><span class="pre">KeyValueTable</span></code> to store the names it reads from the stream. Every time a new
+name is received, it is stored in the table under the key <code class="docutils literal"><span class="pre">name</span></code>-and it overwrites any name that was previously
+stored:</p>
+<div class="highlight-java"><div class="highlight"><pre>    @UseDataSet(&quot;whom&quot;)
+    private KeyValueTable whom;
+
+    private Metrics metrics;
+
+    @ProcessInput
+    public void process(StreamEvent event) {
+      byte[] name = Bytes.toBytes(event.getBody());
+      if (name.length &gt; 0) {
+        whom.write(NAME, name);
+
+        if (name.length &gt; 10) {
+          metrics.count(&quot;names.longnames&quot;, 1);
+        }
+        metrics.count(&quot;names.bytes&quot;, name.length);
+      }
+    }
+  }
+
+  /**
+   * A {@link Service} that creates a greeting using a user&#39;s name.
+</pre></div>
+</div>
+<p>Note that the flowlet also emits metrics: every time a name longer than 10 characters is received,
+the counter <code class="docutils literal"><span class="pre">names.longnames</span></code> is incremented by one, and the metric <code class="docutils literal"><span class="pre">names.bytes</span></code> is incremented
+by the length of the name. We will see below how to retrieve these metrics using the
+<a class="reference external" href="../source/../../reference-manual/http-restful-api/metrics.html#http-restful-api-metrics" title="(in Cask Data Application Platform v3.1.1)"><span>Metrics HTTP RESTful API</span></a>.</p>
+</div>
+<div class="section" id="the-greeting-service">
+<h3>The <code class="docutils literal"><span class="pre">Greeting</span></code> Service<a class="headerlink" href="#the-greeting-service" title="Permalink to this headline">¶</a></h3>
+<p>This service has a single endpoint called <code class="docutils literal"><span class="pre">greet</span></code> that does not accept arguments. When invoked, it
+reads the name stored by the <code class="docutils literal"><span class="pre">NameSaver</span></code> from the key-value table. It return a simple greeting with that name:</p>
+<div class="highlight-java"><div class="highlight"><pre>    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">setName</span><span class="o">(</span><span class="n">SERVICE_NAME</span><span class="o">);</span>
+      <span class="n">setDescription</span><span class="o">(</span><span class="s">&quot;Service that creates a greeting using a user&#39;s name.&quot;</span><span class="o">);</span>
+      <span class="n">addHandler</span><span class="o">(</span><span class="k">new</span> <span class="n">GreetingHandler</span><span class="o">());</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**</span>
+<span class="cm">   * Greeting Service handler.</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">GreetingHandler</span> <span class="kd">extends</span> <span class="n">AbstractHttpServiceHandler</span> <span class="o">{</span>
+
+    <span class="nd">@UseDataSet</span><span class="o">(</span><span class="s">&quot;whom&quot;</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">KeyValueTable</span> <span class="n">whom</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">Metrics</span> <span class="n">metrics</span><span class="o">;</span>
+
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;greet&quot;</span><span class="o">)</span>
+    <span class="nd">@GET</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">greet</span><span class="o">(</span><span class="n">HttpServiceRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServiceResponder</span> <span class="n">responder</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kt">byte</span><span class="o">[]</span> <span class="n">name</span> <span class="o">=</span> <span class="n">whom</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">NameSaver</span><span class="o">.</span><span class="na">NAME</span><span class="o">);</span>
+      <span class="n">String</span> <span class="n">toGreet</span> <span class="o">=</span> <span class="n">name</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">Charsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">)</span> <span class="o">:</span> <span class="s">&quot;World&quot;</span><span class="o">;</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">toGreet</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&quot;Jane Doe&quot;</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">count</span><span class="o">(</span><span class="s">&quot;greetings.count.jane_doe&quot;</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="n">responder</span><span class="o">.</span><span class="na">sendString</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;Hello %s!&quot;</span><span class="o">,</span> <span class="n">toGreet</span><span class="o">));</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Note that the service, like the flowlet, also emits metrics: every time the name <em>Jane Doe</em> is received,
+the counter <code class="docutils literal"><span class="pre">greetings.count.jane_doe</span></code> is incremented by one.
+We will see below how to retrieve this metric using the
+<a class="reference external" href="../source/../../reference-manual/http-restful-api/metrics.html#http-restful-api-metrics" title="(in Cask Data Application Platform v3.1.1)"><span>Metrics HTTP RESTful API</span></a>.</p>
+</div>
+</div>
+<div class="section" id="building-and-starting">
+<h2>Building and Starting<a class="headerlink" href="#building-and-starting" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">You can either build the example (as described in <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-example" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Building an Example Application</span></a>) or use the pre-built JAR file included in the CDAP SDK
+(as described in <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-deploying" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Deploying an Application</span></a>):</p>
+<pre class="literal-block">
+examples/HelloWorld/target/HelloWorld-3.1.2.jar
+</pre>
+</li>
+<li><p class="first">Start CDAP (as described in <a class="reference external" href="../source/../../developers-manual/getting-started/start-stop-cdap.html#start-stop-cdap" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Starting and Stopping CDAP</span></a>).</p>
+</li>
+<li><p class="first">Deploy the application, as described in <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-deploying" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Deploying an Application</span></a>.</p>
+</li>
+<li><p class="first">Once the application has been deployed, you can start its components, as described in
+<a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-starting-application" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Starting an Application</span></a>, and detailed at the
+start of <a class="reference external" href="#running-the-example">running the example</a>.</p>
+</li>
+<li><p class="first">Once all components are started, <a class="reference external" href="#running-the-example">run the example</a>.</p>
+</li>
+<li><p class="first">When finished, you can <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-stopping" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">stop</span></a>
+and <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-removing" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">remove the application</span></a>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="running-the-example">
+<h2>Running the Example<a class="headerlink" href="#running-the-example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="starting-the-flow">
+<h3>Starting the Flow<a class="headerlink" href="#starting-the-flow" title="Permalink to this headline">¶</a></h3>
+<p>Once the application is deployed:</p>
+<ul>
+<li><p class="first">Go to the <em>HelloWorld</em> <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/overview/status">application overview page</a>,
+click <code class="docutils literal"><span class="pre">WhoFlow</span></code> to get to the flow detail page, then click the <em>Start</em> button; or</p>
+</li>
+<li><p class="first">From the Standalone CDAP SDK directory, use the Command Line Interface:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ cdap-cli.sh start flow HelloWorld.WhoFlow
+
+Successfully started flow &#39;WhoFlow&#39; of application &#39;HelloWorld&#39; with stored runtime arguments &#39;{}&#39;
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="starting-the-service">
+<h3>Starting the Service<a class="headerlink" href="#starting-the-service" title="Permalink to this headline">¶</a></h3>
+<p>Once the application is deployed:</p>
+<ul>
+<li><p class="first">Go to the <em>HelloWorld</em> <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/overview/status">application overview page</a>,
+click <code class="docutils literal"><span class="pre">Greeting</span></code> to get to the service detail page, then click the <em>Start</em> button; or</p>
+</li>
+<li><p class="first">From the Standalone CDAP SDK directory, use the Command Line Interface:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ cdap-cli.sh start service HelloWorld.Greeting
+
+Successfully started service &#39;Greeting&#39; of application &#39;HelloWorld&#39; with stored runtime arguments &#39;{}&#39;
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="injecting-a-name">
+<h3>Injecting a Name<a class="headerlink" href="#injecting-a-name" title="Permalink to this headline">¶</a></h3>
+<p>In the application&#8217;s detail page, click on <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/programs/flows/WhoFlow/runs"><em>WhoFlow</em></a>. This takes you to
+the flow details page. (If you haven&#8217;t already started the flow, click on the <em>Start</em>
+button in the right-side, below the green arrow.) The flow&#8217;s <em>status</em> will read <em>RUNNING</em>
+when it is ready to receive events.</p>
+<p>Now click on the <em>who</em> stream on the left side of the flow visualization, which brings up
+a pop-up window. Enter a name and click the <em>Inject</em> button. After you close the pop-up
+window, you will see that the counters for both the stream and the <em>saver</em> flowlet
+increase to 1. You can repeat this step to enter more names, but remember that only the
+last name is stored in the key-value table.</p>
+<p>Metrics are collected based on the <code class="docutils literal"><span class="pre">bytes</span></code> metric (the total number of bytes of names),
+the <code class="docutils literal"><span class="pre">longnames</span></code> metric (the number of names, each greater than 10 characters), and the
+<code class="docutils literal"><span class="pre">greetings.count.jane_doe</span></code> metric (the number of times the name <em>Jane Doe</em> has been
+&#8220;greeted&#8221;).</p>
+<p>To try out these metrics, first send a few long names (each greater than 10 characters)
+and send <em>Jane Doe</em> a number of times.</p>
+</div>
+<div class="section" id="using-the-service">
+<h3>Using the Service<a class="headerlink" href="#using-the-service" title="Permalink to this headline">¶</a></h3>
+<p>Go back to the application&#8217;s detail page, and click on the <em>Greeting</em> service. (If you
+haven&#8217;t already started the service, click on the <em>Start</em> button on the right-side.) The
+service&#8217;s label will read <em>Running</em> when it is ready to receive events.</p>
+<p>Now you can make a request to the service using <code class="docutils literal"><span class="pre">curl</span></code>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">curl</span> <span class="o">-</span><span class="n">w</span><span class="sc">&#39;\n&#39;</span> <span class="n">http</span><span class="o">:</span><span class="c1">//localhost:10000/v3/namespaces/default/apps/HelloWorld/services/Greeting/methods/greet</span>
+</pre></div>
+</div>
+<p>If the last name you entered was <em>Tom</em>, the service will respond with <code class="docutils literal"><span class="pre">Hello</span> <span class="pre">Tom!</span></code></p>
+<p>There is a <em>Make Request</em> button in the CDAP UI that will make the same request, with a
+similar response.</p>
+</div>
+<div class="section" id="retrieving-metrics">
+<h3>Retrieving Metrics<a class="headerlink" href="#retrieving-metrics" title="Permalink to this headline">¶</a></h3>
+<p>You can now query the metrics that are emitted by the flow and service. If a particular
+metric has no value, it will return an empty array in the <code class="docutils literal"><span class="pre">&quot;series&quot;</span></code> of the results, such
+as:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">{&quot;startTime&quot;:0,&quot;endTime&quot;:1429475995,&quot;series&quot;:[]}</span>
+</pre></div>
+</div>
+<p>To see the value of the <code class="docutils literal"><span class="pre">names.bytes</span></code> metric, you can make an HTTP request to the
+<a class="reference external" href="../source/../../reference-manual/http-restful-api/metrics.html#http-restful-api-metrics" title="(in Cask Data Application Platform v3.1.1)"><span>Metrics HTTP RESTful API</span></a> using curl:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> curl -w<span class="s1">&#39;\n&#39;</span> -X POST <span class="s1">&#39;http://localhost:10000/v3/metrics/query?tag=namespace:default&amp;tag=app:HelloWorld&amp;tag=flow:WhoFlow&amp;tag=flowlet:saver&amp;metric=user.names.bytes&amp;aggregate=true&#39;</span>
+<span class="go">{&quot;startTime&quot;:0,&quot;endTime&quot;:1429477634,&quot;series&quot;:[{&quot;metricName&quot;:&quot;user.names.bytes&quot;,&quot;grouping&quot;:{},&quot;data&quot;:[{&quot;time&quot;:0,&quot;value&quot;:44}]}]}</span>
+</pre></div>
+</div>
+<p>To see the value of the <code class="docutils literal"><span class="pre">names.longnames</span></code> metric (the number of names, each greater than 10 characters),
+you can use:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> curl -w<span class="s1">&#39;\n&#39;</span> -X POST <span class="s1">&#39;http://localhost:10000/v3/metrics/query?tag=namespace:default&amp;tag=app:HelloWorld&amp;tag=flow:WhoFlow&amp;tag=flowlet:saver&amp;metric=user.names.longnames&amp;aggregate=true&#39;</span>
+<span class="go">{&quot;startTime&quot;:0,&quot;endTime&quot;:1429476082,&quot;series&quot;:[{&quot;metricName&quot;:&quot;user.names.longnames&quot;,&quot;grouping&quot;:{},&quot;data&quot;:[{&quot;time&quot;:0,&quot;value&quot;:1}]}]}</span>
+</pre></div>
+</div>
+<p>To see the value of the <code class="docutils literal"><span class="pre">greetings.count.jane_doe</span></code> metric (the number of times the name <em>Jane Doe</em> has been &#8220;greeted&#8221;),
+you can use:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> curl -w<span class="s1">&#39;\n&#39;</span> -X POST <span class="s1">&#39;http://localhost:10000/v3/metrics/query?tag=namespace:default&amp;tag=app:HelloWorld&amp;tag=service:Greeting&amp;metric=user.greetings.count.jane_doe&amp;aggregate=true&#39;</span>
+<span class="go">{&quot;startTime&quot;:0,&quot;endTime&quot;:1429464632,&quot;series&quot;:[{&quot;metricName&quot;:&quot;user.greetings.count.jane_doe&quot;,&quot;grouping&quot;:{},&quot;data&quot;:[{&quot;time&quot;:0,&quot;value&quot;:0}]}]}</span>
+</pre></div>
+</div>
+<p>The results you receive will vary depending on the entries you have made to the flow.</p>
+</div>
+</div>
+<div class="section" id="stopping-and-removing-the-application">
+<h2>Stopping and Removing the Application<a class="headerlink" href="#stopping-and-removing-the-application" title="Permalink to this headline">¶</a></h2>
+<p>Once done, you can stop the application as described in <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-stopping" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Stopping an Application</span></a>. Here is an example-specific description of the steps:</p>
+<p><strong>Stopping the Flow</strong></p>
+<ul>
+<li><p class="first">Go to the <em>HelloWorld</em> <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/overview/status">application overview page</a>,
+click <code class="docutils literal"><span class="pre">WhoFlow</span></code> to get to the flow detail page, then click the <em>Stop</em> button; or</p>
+</li>
+<li><p class="first">From the Standalone CDAP SDK directory, use the Command Line Interface:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> cdap-cli.sh stop flow HelloWorld.WhoFlow
+<span class="go">Successfully stopped Flow &#39;WhoFlow&#39; of application &#39;HelloWorld&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>Stopping the Service</strong></p>
+<ul>
+<li><p class="first">Go to the <em>HelloWorld</em> <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/overview/status">application overview page</a>,
+click <code class="docutils literal"><span class="pre">Greeting</span></code> to get to the service detail page, then click the <em>Stop</em> button; or</p>
+</li>
+<li><p class="first">From the Standalone CDAP SDK directory, use the Command Line Interface:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> cdap-cli.sh stop service HelloWorld.Greeting
+<span class="go">Successfully stopped service &#39;Greeting&#39; of application &#39;HelloWorld&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>Removing the Application</strong></p>
+<p>You can now remove the application as described in <a class="reference external" href="../source/../../developers-manual/getting-started/building-apps.html#cdap-building-running-removing" title="(in Cask Data Application Platform v3.1.2)"><span class="xref std std-ref">Removing an Application</span></a>, or:</p>
+<ul>
+<li><p class="first">Go to the <em>HelloWorld</em> <a class="reference external" href="http://localhost:9999/ns/default/apps/HelloWorld/overview/status">application overview page</a>,
+click the <em>Actions</em> menu on the right side and select <em>Manage</em> to go to the Management pane for the application,
+then click the <em>Actions</em> menu on the right side and select <em>Delete</em> to delete the application; or</p>
+</li>
+<li><p class="first">From the Standalone CDAP SDK directory, use the Command Line Interface:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> cdap-cli.sh delete app HelloWorld
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="manuals links">
+    <h3><a href="../table-of-contents/../../index.html"
+        rel="nofollow">CDAP Documentation v3.1.2</a></h3>
+    <ul class="this-page-menu">
+      <li><div class=""></div><a href="../table-of-contents/../../index.html"
+            rel="nofollow">Overview</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../introduction/index.html"
+            rel="nofollow">Introduction to CDAP</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../developers-manual/index.html"
+            rel="nofollow">Developers’ Manual</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../application-templates/index.html"
+            rel="nofollow">Application Templates</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../admin-manual/index.html"
+            rel="nofollow">Administration Manual</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../integrations/index.html"
+            rel="nofollow">Integrations</a></li>
+            
+      <li><div class=""></div><b><a href="../table-of-contents/../../examples-manual/index.html"
+            rel="nofollow">Examples, Guides, and Tutorials</a></b></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/index.html"
+            rel="nofollow">Reference Manual</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/release-notes.html"
+            rel="nofollow">Release Notes</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/glossary.html"
+            rel="nofollow">Glossary</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../reference-manual/faq.html"
+            rel="nofollow">FAQ</a></li>
+            
+      <li><div class=""></div><a href="../table-of-contents/../../search.html"
+            rel="nofollow">Search</a></li>
+    </ul>
+   </div><!--
+  Copyright © 2014-2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+
+    
+<h3 class="pagenavtitle"><a href="../table-of-contents.html">Examples, Guides, and Tutorials:<br> Table&nbsp;of&nbsp;Contents</a></h3>
+<nav class="pagenav">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Hello World</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-and-starting">Building and Starting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-example">Running the Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stopping-and-removing-the-application">Stopping and Removing the Application</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="count-random.html">Count Random</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data-cleansing.html">Data Cleansing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileset.html">File Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="log-analysis.html">Log Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="purchase.html">Purchase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spark-k-means.html">Spark K-Means</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spark-page-rank.html">Spark Page Rank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sport-results.html">Sport Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stream-conversion.html">Stream Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-profiles.html">User Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="web-analytics.html">Web Analytics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wikipedia-data-pipeline.html">Wikipedia Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="word-count.html">Word Count</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to-guides/index.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apps-packs.html">Apps and Packs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="Previous Chapter">Examples</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="count-random.html"
+                        title="Next Chapter">Count Random</a></p>
+  <div role="note" aria-label="downloads links">
+    <h3>Downloads</h3>
+    <ul class="this-page-menu">
+      <li><a href="http://docs.cask.co/cdap/3.1.2/cdap-docs-3.1.2-web.zip"
+            rel="nofollow">Zip Archive of CDAP Documentation</a></li>
+    </ul>
+   </div>
+  
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div role="note" aria-label="other links">
+    <h3><a href="http://docs.cask.co/" target="_blank">Documentation</a></h3>
+    <ul class="this-page-menu">
+        <li><a href="http://docs.cask.co/cdap/index.html" target="_blank">CDAP</a></li>
+        <li><a href="http://docs.cask.co/coopr/index.html" target="_blank">Coopr</a></li>
+        <li><a href="http://docs.cask.co/tephra/index.html" target="_blank">Tephra</em></a></li>
+        <li><a href="http://docs.cask.co/tigon/index.html" target="_blank">Tigon</a></li>
+    </ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer" role="contentinfo">
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+.tg td{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg th{padding:0px 20px 0px 20px;border-width:0px;overflow:hidden;word-break:normal;font-weight:normal;}
+.tg .tg-s6z2{text-align:center;}
+.tg .tg-0ord{text-align:right;}
+.tg a{font-weight:bold;}
+</style>
+<table class="tg" width= 100%>
+  <tr>
+    <th class="tg-031e">Previous Topic: 
+    <a title="Examples" href="index.html" />Examples</a>&nbsp;&nbsp;
+    
+    </th>
+    <th class="tg-s6z2">
+        Copyright &copy; 2014-2015 Cask Data, Inc.
+    
+    </th>
+    <th class="tg-0ord">&nbsp;&nbsp;Next Topic:
+    <a title="Count Random" href="count-random.html" />Count Random</a>
+    
+    </th>
+  </tr>
+</table>
+
+    </div>
+  </body>
+</html>
