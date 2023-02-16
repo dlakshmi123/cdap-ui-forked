@@ -1,0 +1,246 @@
+<!--
+  Copyright © 2015-2017 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+<!-- Control Buttons -->
+<div class="btn-group-vertical btn-group-sm zoom-control">
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.zoomIn()"
+          uib-tooltip="Zoom In"
+          ng-if="!DAGPlusPlusCtrl.disableNodeClick"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="fa fa-plus"></i>
+  </button>
+
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.zoomOut()"
+          ng-if="!DAGPlusPlusCtrl.disableNodeClick"
+          uib-tooltip="Zoom Out"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="fa fa-minus"></i>
+  </button>
+
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.fitToScreen()"
+          ng-if="!DAGPlusPlusCtrl.disableNodeClick"
+          uib-tooltip="Fit to screen"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="icon-fit"></i>
+  </button>
+
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.cleanUpGraph()"
+          ng-if="!DAGPlusPlusCtrl.isDisabled"
+          uib-tooltip="Align"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="icon-clean"></i>
+  </button>
+
+
+  <!-- Adding Comments -->
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.addComment()"
+          ng-if="!DAGPlusPlusCtrl.isDisabled"
+          uib-tooltip="Add Comments"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="fa fa-commenting"></i>
+  </button>
+
+  <!-- Undo Nodes Action -->
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.undoActions()"
+          ng-if="!DAGPlusPlusCtrl.isDisabled"
+          ng-disabled="DAGPlusPlusCtrl.undoStates.length === 0"
+          uib-tooltip="Undo (Ctrl/Cmd + Z)"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="fa fa-undo"></i>
+  </button>
+
+  <!-- Redo Nodes Action -->
+  <button class="btn btn-default"
+          ng-click="DAGPlusPlusCtrl.redoActions()"
+          ng-if="!DAGPlusPlusCtrl.isDisabled"
+          ng-disabled="DAGPlusPlusCtrl.redoStates.length === 0"
+          uib-tooltip="Redo (Ctrl/Cmd + Shift + Z)"
+          tooltip-append-to-body="true"
+          tooltip-placement="left"
+          tooltip-popup-delay="500">
+    <i class="fa fa-repeat"></i>
+  </button>
+</div>
+
+<div class="my-js-dag"
+    ng-class="{'disabled': DAGPlusPlusCtrl.isDisabled, 'normal-cursor': disableNodeClick, 'preview-mode': previewMode }"
+    ng-click="DAGPlusPlusCtrl.toggleNodeMenu(); DAGPlusPlusCtrl.openDagMenu(false);">
+    <div id="diagram-container">
+      <div id="dag-container" ng-style="DAGPlusPlusCtrl.panning.style">
+        <!--
+          The condition on ng-click is to prevent user from being able to click
+          if the DAG is disabled. It will prevent the highlighting of nodes on select
+        -->
+        <div ng-repeat="node in nodes" class="box {{node.type}}" ng-style="node._uiPosition"
+               data-type="{{node.type}}"
+               id="{{node.name}}"
+               ng-class="{'wrangler': node.plugin.name === 'Wrangler'}">
+          <div class="node"
+                ng-mouseenter="DAGPlusPlusCtrl.nodeMouseEnter(node)"
+                ng-mouseleave="DAGPlusPlusCtrl.nodeMouseLeave(node)">
+            <div class="inner" ng-if="['action', 'sparkprogram'].indexOf(node.type) !== -1"></div>
+            <div class="endpoint-circle"
+                  ng-class="{'disabled': DAGPlusPlusCtrl.isDisabled, 'endpoint-circle-right': node.type === 'condition'}"
+                  ng-mouseup="DAGPlusPlusCtrl.selectEndpoint($event, node)">
+              <div class="endpoint-caret" ng-if="!DAGPlusPlusCtrl.isDisabled"></div>
+            </div>
+            <div class="endpoint-circle endpoint-circle-bottom"
+                  ng-if="node.type === 'condition'"
+                  ng-class="{'disabled': DAGPlusPlusCtrl.isDisabled}"
+                  ng-mouseup="DAGPlusPlusCtrl.selectEndpoint($event, node)">
+              <div class="endpoint-caret" ng-if="!DAGPlusPlusCtrl.isDisabled"></div>
+            </div>
+            <div ng-if="node.error">
+              <div class="error-node-notification"
+                   ng-if="node.errorCount > 0"
+                   uib-tooltip="{{node.errorMessage || 'Please check the node properties'}}"
+                   tooltip-append-to-body="true"
+                   tooltip-class="tooltip-error">
+                <span class="badge badge-danger">
+                  <span>{{node.errorCount}}</span>
+                </span>
+              </div>
+            </div>
+            <div ng-if="!node.error">
+              <div class="error-node-notification"
+                   ng-if="node.errorCount > 0"
+                   uib-tooltip="Please check the node properties"
+                   tooltip-append-to-body="true"
+                   tooltip-class="tooltip-warning">
+                <span class="badge badge-warning">
+                  <span>{{node.errorCount}}</span>
+                </span>
+              </div>
+            </div>
+            <div class="node-info">
+              <div
+                ng-if="!DAGPlusPlusCtrl.shouldShowCustomIcon(node)"
+                class="node-icon fa {{node.icon}}"></div>
+
+              <div
+                class="node-icon icon-container"
+                ng-if="DAGPlusPlusCtrl.shouldShowCustomIcon(node)"
+              >
+                <img src="{{ DAGPlusPlusCtrl.getCustomIconSrc(node) }}" />
+              </div>
+
+
+              <div class="node-metadata">
+                <div class="node-name"
+                      ng-bind="node.plugin.label || node.name | myEllipsis: 15"
+                      ng-attr-title="{{node.plugin.label || node.name}}">
+                </div>
+                <div class="node-version"
+                      ng-class="{ 'hidden': DAGPlusPlusCtrl.nodeMenuOpen === node.name}"
+                      ng-bind="node.plugin.artifact.version">
+                </div>
+                <button class="node-configure-btn"
+                        ng-class="{'btn-shown': DAGPlusPlusCtrl.nodeMenuOpen === node.name}"
+                        ng-click="!disableNodeClick && DAGPlusPlusCtrl.onNodeClick($event, node)">
+                  <span class="node-configure-btn-label">
+                    Properties
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div class="node-metrics"
+                  ng-if="DAGPlusPlusCtrl.isDisabled && node.type !== 'condition'">
+              <my-node-metrics
+                on-click="DAGPlusPlusCtrl.onMetricsClick"
+                node="node"
+                disabled="disableMetricsClick"
+                metrics-data="metricsData">
+              </my-node-metrics>
+            </div>
+            <div class="node-actions">
+              <span ng-if="DAGPlusPlusCtrl.nodeMenuOpen !== node.name"
+                    ng-class="{'disabled': DAGPlusPlusCtrl.isDisabled}"
+                    class="menu-icon menu-icon-node fa fa-bars float-xs-right"
+                    ng-click="!DAGPlusPlusCtrl.isDisabled && DAGPlusPlusCtrl.toggleNodeMenu(node.name, $event)">
+              </span>
+            </div>
+          </div>
+          <div ng-if="DAGPlusPlusCtrl.nodeMenuOpen === node.name"
+                ng-click="$event.stopPropagation()"
+                class="node-popover-menu">
+            <div
+              class="menu-icon fa fa-bars"
+              ng-click="DAGPlusPlusCtrl.toggleNodeMenu(node.name, $event)">
+            </div>
+            <div class="menu-content">
+              <div class="menu-content-action menu-content-delete"
+                ng-click="DAGPlusPlusCtrl.onNodeDelete($event, node)">
+                Delete
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div ng-repeat="comment in DAGPlusPlusCtrl.comments"
+              class="comment-box"
+              ng-click="!DAGPlusPlusCtrl.isDisabled && DAGPlusPlusCtrl.commentSelect($event, comment)"
+              ng-style="comment._uiPosition"
+              id="{{comment.id}}">
+          <div ng-if="comment.isActive">
+            <textarea
+              ng-model="comment.content"
+              class="form-control"
+              my-focus-watch="comment.isActive">
+            </textarea>
+          </div>
+
+          <div class="comment-content"
+               ng-if="!comment.isActive"
+               marked="comment.content">
+          </div>
+
+          <div class="fa fa-close"
+               ng-click="DAGPlusPlusCtrl.deleteComment(comment)"
+               ng-if="!DAGPlusPlusCtrl.isDisabled">
+          </div>
+
+        </div>
+      </div>
+      <div ng-show="DAGPlusPlusCtrl.dagMenuOpen"
+            ng-click="$event.stopPropagation()"
+            class="dag-popover-menu">
+        <div class="menu-content">
+          <div class="menu-content-action menu-content-delete"
+            ng-click="DAGPlusPlusCtrl.removeSelectedConnections(); DAGPlusPlusCtrl.openDagMenu(false)">
+            Delete
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
