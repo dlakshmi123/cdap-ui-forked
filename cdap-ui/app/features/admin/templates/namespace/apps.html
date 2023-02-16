@@ -1,0 +1,126 @@
+<div class="row">
+    <div class="col-xs-6">
+        <h2> Applications </h2>
+    </div>
+    <div class="col-xs-6 text-right" ng-if="apps.length > 0">
+        <div class="btn-group dropdown-right" dropdown>
+          <button type="button" class="btn btn-default dropdown-toggle white-dropdown" dropdown-toggle>
+            Add App <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" role="menu">
+            <li>
+              <my-file-select dropdown="true"
+                              data-button-label="Custom App"
+                              on-file-select="onFileSelected($files)">
+              </my-file-select>
+            </li>
+            <li>
+              <a ui-sref="adapters.create({namespace: $stateParams.nsadmin, type: 'ETLBatch'})" class="clearfix">
+                <span class="pull-left">ETL Batch App</span>
+                <i class="icon-ETLBatch pull-right"></i>
+              </a>
+            </li>
+            <li>
+              <a ui-sref="adapters.create({namespace: $stateParams.nsadmin, type: 'ETLRealtime'})" class="clearfix">
+                <span class="pull-left">ETL Realtime App</span>
+                <i class="icon-ETLRealtime pull-right"></i>
+              </a>
+            </li>
+            <li>
+              <a ui-sref="adapters.list({namespace: $stateParams.nsadmin})"> Drafts </a>
+            </li>
+          </ul>
+        </div>
+    </div>
+</div>
+
+<div ng-if="apps.length > 0">
+    <div class="table-responsive">
+        <table class="table table-curved" cask-sortable>
+            <thead>
+              <tr ng-class="{'sort-enabled': apps.length>0}">
+                <th data-predicate="name">Name</th>
+                <th data-predicate="version">Version</th>
+                <th data-predicate="type">Type</th>
+                <th data-predicate="description">Description</th>
+                <th> </th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="app in apps | orderBy:sortable.predicate:sortable.reverse">
+                    <td>
+                        <a ng-if="app.type !== 'Adapter'" ui-sref="admin.namespace.detail.apps.metadata({appId: app.id})">
+                            <strong tooltip="{{app.name}}"
+                                    tooltip-enable="app.name.length > 25"
+                                    tooltip-append-to-body="true">
+                              {{ ::app.name | myEllipsis:25 }}
+                            </strong>
+                        </a>
+                        <span ng-if="app.type === 'Adapter'"
+                              tooltip="{{app.name}}"
+                              tooltip-enable="app.name.length > 25"
+                              tooltip-append-to-body="true">
+                          {{ ::app.name | myEllipsis:25 }}
+                        </span>
+                    </td>
+                    <td>{{ ::app.version }}</td>
+                    <td ng-if="app.type !== 'Adapter'">
+                      <span class="icon-fist"></span>
+                      <span>App</span>
+                    </td>
+                    <td ng-if="app.type === 'Adapter'">
+                      <span class="icon-{{app.template}}"></span>
+                      <span>{{ ::app.template }}</span>
+                    </td>
+                    <td>
+                      <span tooltip="{{app.description}}"
+                            tooltip-enable="app.description.length > 25"
+                            tooltip-append-to-body="true">
+                        {{ ::app.description | myEllipsis:25 }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <a href=""
+                      ng-click="caskConfirm()"
+                      cask-confirmable="deleteApp(app.id, app.type)"
+                      data-confirmable-content="Are you sure you want to delete this App?">
+                        <span class=" fa fa-trash text-danger"></span>
+                      </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="well text-center" ng-if="apps.length === 0">
+    <p> You haven't deployed any apps. </p>
+    <div class="btn-group dropdown-right" dropdown>
+      <button type="button" class="btn btn-default dropdown-toggle white-dropdown" dropdown-toggle>
+        Add App <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right" role="menu">
+        <li>
+          <my-file-select dropdown="true"
+                          data-button-label="Custom App"
+                          on-file-select="onFileSelected($files)">
+          </my-file-select>
+        </li>
+        <li>
+          <a ui-sref="adapters.create({namespace: $stateParams.nsadmin, type: 'ETLBatch'})" class="clearfix">
+            <span class="pull-left">ETL Batch App</span>
+            <i class="icon-ETLBatch pull-right"></i>
+          </a>
+        </li>
+        <li>
+          <a ui-sref="adapters.create({namespace: $stateParams.nsadmin, type: 'ETLRealtime'})" class="clearfix">
+            <span class="pull-left">ETL Realtime App</span>
+            <i class="icon-ETLRealtime pull-right"></i>
+          </a>
+        </li>
+        <li>
+          <a ui-sref="adapters.list({namespace: $stateParams.nsadmin})"> Drafts </a>
+        </li>
+      </ul>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+@import "../../../styles/variables.less";
+@import "../../../styles/themes/cdap/mixins.less";
+
+my-dsv {
+  .dsv-container {
+    background-color: @body-bg;
+    border: 1px solid #ddd;
+    padding: 20px 10px;
+    .border-radius(4px);
+
+    .empty-container {
+      .btn.btn-info {
+        margin-top: 10px;
+      }
+    }
+  }
+}

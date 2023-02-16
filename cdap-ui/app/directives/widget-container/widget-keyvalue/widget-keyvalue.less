@@ -1,0 +1,29 @@
+@import "../../../styles/variables.less";
+
+my-key-value {
+
+  .keyvalue-container {
+    background-color: @body-bg;
+    border: 1px solid #ddd;
+    border-radius: @border-radius-base;
+    padding: 20px 10px;
+    .empty-container {
+      padding-left: 15px;
+    }
+  }
+
+  .labels {
+    [class*="col-"] {
+      margin-bottom: 10px;
+    }
+  }
+
+  .delimiter-label {
+    line-height: 26px;
+    padding-left: 17px;
+
+    > strong {
+      vertical-align: middle;
+    }
+  }
+}

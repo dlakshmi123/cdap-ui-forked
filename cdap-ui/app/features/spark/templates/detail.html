@@ -1,0 +1,33 @@
+<div ncy-breadcrumb ng-if="!$state.params.sourceId"></div>
+<my-breadcrumb params="$state.params" ng-if="$state.params.sourceId"></my-breadcrumb>
+
+<div class="row" program-heading>
+  <div class="col-sm-6">
+    <h2 class="programTitle">
+      <span ng-bind="$state.params.programId"></span>
+    </h2>
+    <div class="type-block">
+      <span class="icon-spark"></span>
+      <small> Type: Spark </small>
+    </div>
+  </div>
+  <div class="col-sm-6 text-right">
+    <my-start-stop-button
+      type="spark"
+      is-stoppable="true">
+    </my-start-stop-button>
+  </div>
+</div>
+
+<div class="cdap-subnav-end"></div>
+<ul class="nav nav-tabs slanted-tabs" role="tablist">
+  <li role="presentation" ui-sref-active="active">
+    <a ui-sref="spark.detail.runs" role="tab">Runs</a>
+  </li>
+  <li role="presentation" ui-sref-active="active">
+    <a ui-sref="spark.detail.history" role="tab">History</a>
+  </li>
+</ul>
+
+<br />
+<ui-view role="tabpanel"/>
