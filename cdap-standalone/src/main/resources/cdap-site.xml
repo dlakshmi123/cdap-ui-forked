@@ -1,0 +1,217 @@
+<!--
+  Copyright © 2014-2016 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+  -->
+<configuration>
+
+  <!-- Global Configuration -->
+
+  <property>
+    <name>enable.unrecoverable.reset</name>
+    <value>true</value>
+    <description>
+      Determines if resetting CDAP should be enabled. **WARNING: Enabling
+      this option makes it possible to delete all applications and data; NO
+      RECOVERY IS POSSIBLE!**
+    </description>
+  </property>
+
+
+  <!-- Applications Configuration -->
+  
+  <property>
+    <name>app.artifact.dir</name>
+    <value>artifacts</value>
+    <description>
+      Semicolon-separated list of local directories scanned for system artifacts
+      to add to the artifact repository
+    </description>
+  </property>
+
+  <property>
+    <name>app.program.runtime.extensions.dir</name>
+    <value>ext/runtimes</value>
+    <description>
+      Semicolon-separated list of local directories that are scanned for
+      program runtime extensions
+    </description>
+  </property>
+
+  <property>
+    <name>enable.preview</name>
+    <value>true</value>
+    <description>
+      Determines if preview should be enabled.
+    </description>
+  </property>
+
+
+  <!-- Datasets Configuration -->
+  
+  <property>
+    <name>data.local.storage.blocksize</name>
+    <value>1024</value>
+    <description>
+      Block size in bytes for data fabric when in Standalone CDAP
+    </description>
+  </property>
+
+  <property>
+    <name>data.local.storage.cachesize</name>
+    <value>104857600</value>
+    <description>
+      Cache size in bytes for data fabric when in Standalone CDAP
+    </description>
+  </property>
+
+
+  <!-- Logging Configuration -->
+  
+  <property>
+    <name>log.base.dir</name>
+    <value>logs/avro</value>
+    <description>
+      Base log directory
+    </description>
+  </property>
+
+  <property>
+    <name>log.publish.num.partitions</name>
+    <value>1</value>
+    <description>
+      Number of CDAP Kafka service partitions to publish the logs to
+    </description>
+  </property>
+
+  <property>
+    <name>log.retention.duration.days</name>
+    <value>7</value>
+    <description>
+      Duration in days of log file HDFS retention
+    </description>
+  </property>
+
+
+  <!-- Metrics Configuration -->
+  
+  <property>
+    <name>metrics.data.table.retention.resolution.1.seconds</name>
+    <value>7200</value>
+    <description>
+      Retention resolution in seconds of the 1-second resolution table;
+      default retention period is 2 hours
+    </description>
+  </property>
+
+
+  <!-- Router Configuration -->
+  
+  <property>
+    <name>router.address</name>
+    <value>127.0.0.1</value>
+    <description>
+      CDAP Router service address to which CDAP UI connects (deprecated; use router.server.address directly)
+    </description>
+  </property>
+
+  <property>
+    <name>router.bind.address</name>
+    <value>0.0.0.0</value>
+    <description>
+      CDAP Router service bind address
+    </description>
+  </property>
+
+  <property>
+    <name>router.server.address</name>
+    <value>${router.address}</value>
+    <description>
+      CDAP Router service address to which CDAP UI connects
+    </description>
+  </property>
+
+
+  <!-- Stream Configuration -->
+  
+  <property>
+    <name>stream.container.instances</name>
+    <value>1</value>
+    <description>
+      Number of YARN container instances for the stream handler; in
+      Standalone CDAP, it is always one
+    </description>
+  </property>
+
+
+  <!-- Zookeeper Configuration (only used when Zookeeper server is started in Standalone) -->
+
+  <property>
+    <name>local.zkserver.port</name>
+    <value>2181</value>
+    <description>
+      Port for Zookeeper Server
+    </description>
+  </property>
+
+  <property>
+    <name>zookeeper.quorum</name>
+    <value>127.0.0.1:${local.zkserver.port}/${root.namespace}</value>
+    <description>
+      ZooKeeper quorum string; specifies the ZooKeeper host:port; substitute the quorum
+      (FQDN1:2181,FQDN2:2181,...) for the components shown here
+    </description>
+  </property>
+
+  <!-- Kafka Configuration (only used when Kafka server is started in Standalone) -->
+
+  <property>
+    <name>local.kafka.dir</name>
+    <value>${app.program.runtime.extensions.dir}/kafka</value>
+    <description>
+      Kafka server artifact and its dependencies
+    </description>
+  </property>
+
+  <property>
+    <name>kafka.server.log.dirs</name>
+    <value>${local.data.dir}/kafka-logs</value>
+    <description>
+      Comma-separated list of CDAP Kafka service log storage directories
+    </description>
+  </property>
+
+  <property>
+    <name>tracker.app.config</name>
+    <value>{
+             "auditLogKafkaConfig" : {
+               "topic" : "${audit.kafka.topic}",
+               "zookeeperString" :
+                     "${router.bind.address}:${local.zkserver.port}/${root.namespace}/${kafka.zookeeper.namespace}"
+             }
+           }
+    </value>
+    <description>
+      Application configuration for Tracker
+    </description>
+  </property>
+
+  <property>
+    <name>kerberos.auth.enabled</name>
+    <value>false</value>
+    <description>
+      Determines if Kerberos authentication is enabled
+    </description>
+  </property>
+
+</configuration>
