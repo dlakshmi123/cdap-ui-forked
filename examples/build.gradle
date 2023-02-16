@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+ant.importBuild 'build.xml'
+ant.importBuild 'build-checkstyle.xml'
+ant.properties['reactor.home'] = '../../singlenode/build/libs/'
+
+examplesCompile.dependsOn ':singlenode:createApiJar'
+examplesJar.dependsOn ':singlenode:createApiJar'
+
+build.dependsOn 'examplesJar'
+clean.dependsOn 'examplesClean'
+
+check.dependsOn 'checkstyle'
