@@ -1,0 +1,25 @@
+{
+  "tracker": {
+    "artifact": {
+      "name": "tracker",
+      "version": "0.3.0-SNAPSHOT",
+      "scope": "SYSTEM"
+    },
+    "appId": "_Tracker",
+    "serviceId": "TrackerService",
+    "flowProgramId": "AuditLogFlow"
+  },
+  "navigator": {
+    "artifact": {
+      "name": "navigator",
+      "version": "0.2.0",
+      "scope": "SYSTEM"
+    },
+    "appId": "_ClouderaNavigator",
+    "programId": "MetadataFlow"
+  },
+  "market": {
+    "path": "http://market.cask.co/preview",
+    "version": "v1"
+  }
+}
