@@ -1,0 +1,31 @@
+@import "../../styles/variables.less";
+
+body.state-dashboard {
+
+  .widget {
+
+    .panel-body {
+      overflow-x: scroll;
+    }
+
+    .panel-footer dl {
+      margin: 0;
+      white-space: nowrap;
+      dt {
+        float: left;
+        clear: left;
+        min-width: 70px;
+        &:after {
+          content: ':\00a0';
+        }
+      }
+      dd {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+
+
+}
