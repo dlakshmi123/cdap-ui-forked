@@ -1,0 +1,37 @@
+#
+# Copyright 2012-2014 Continuuity, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#
+
+# post install script for <%= project %>
+
+package_name="<%= project %>"
+version="<%= @version %>"
+
+mkdir -p /var/log/continuuity /var/run/continuuity /var/continuuity/run || :
+echo $version > /opt/continuuity/$package_name/VERSION
+chown -R continuuity.continuuity /opt/continuuity/$package_name
+chown -R continuuity.continuuity /var/log/continuuity
+chown -R continuuity.continuuity /var/run/continuuity
+chown -R continuuity.continuuity /var/continuuity/run
+chmod +x /opt/continuuity/$package_name/bin/service
+if stat -t /opt/continuuity/$package_name/conf/*-env.sh >/dev/null 2>&1 ; then
+  find /opt/continuuity/$package_name/conf -name '*-env.sh' | xargs -n1 basename | sed 's/-env.sh//' | while read svcname; do
+    if [[ -h /opt/continuuity/$package_name/bin/svc-$svcname ]]; then
+      unlink /opt/continuuity/$package_name/bin/svc-$svcname
+    fi
+    ln -s /opt/continuuity/$package_name/bin/service /opt/continuuity/$package_name/bin/svc-$svcname
+  done
+fi
+
