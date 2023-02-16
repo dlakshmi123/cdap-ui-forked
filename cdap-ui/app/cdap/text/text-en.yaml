@@ -1,0 +1,804 @@
+---
+# Please keep this file alphabetically sorted!
+commons:
+  cask: CASK
+  cdap: CDAP
+  entity:
+    application:
+      plural: Applications
+      short-singular: App
+      short-plural: Apps
+      singular: Application
+    artifact:
+      plural: Artifacts
+      singular: Artifact
+      extensions: Extensions
+      applications: Applications
+      type: Type
+    cdap-data-pipeline:
+      plural: Data Pipelines
+      singular: Data Pipeline
+    cdap-data-streams:
+      plural: Data Streams
+      singular: Data Stream
+    dataset:
+      plural: Datasets
+      singular: Dataset
+      programs: Programs
+      operations: Operations
+      writes: Writes
+    datasetinstance:
+      plural: Datasets
+      singular: Dataset
+    flow:
+      plural: Flows
+      singular: Flow
+    metrics:
+      programs: Programs
+      running: Running
+      failed: Failed
+    mapreduce:
+      plural: MapReduce
+      singular: MapReduce
+    program:
+      plural: Programs
+      singular: Program
+      status: Status
+      runs: Runs
+      application: Application
+    service:
+      plural: Services
+      singular: Service
+    spark:
+      plural: Spark
+      singular: Spark
+    stream:
+      plural: Streams
+      singular: Stream
+      programs: Programs
+      events: Events
+      bytes: Bytes
+    worker:
+      plural: Workers
+      singular: Worker
+    workflow:
+      plural: Workflows
+      singular: Workflow
+    view:
+      plural: Stream Views
+      singular: Stream View
+  hydrator: Cask Hydrator
+  keyValPairs:
+    keyPlaceholder: key
+    valuePlaceholder: value
+  market: Cask Market
+  resource-center: Resource Center
+  tracker: Cask Tracker
+  nameLabel: Name
+  descriptionLabel: Description
+  formatLabel: Format
+  schemaLabel: Schema
+  wrangler: Cask Wrangler
+features:
+  AppDetailedView:
+    Title: Application - {appId}
+    History:
+      emptyMessage: No Runs found.
+  ConfirmationModal:
+    confirmDefaultText: OK
+    cancelDefaultText: Cancel
+  EntityListView:
+    Title: CDAP - Home
+    Info:
+      title: Entities in Namespace
+      subtitle:
+        search: Search Results for
+        filteredBy: filtered by
+        sortedBy: sorted by
+        displayAll: Displaying All Entities
+        displaySome: Displaying
+    emptyMessage: No entities found in the system.
+    Cards:
+      type: "Type: "
+    Errors:
+      retryNow: Retry now
+      secondsLabel: seconds.
+      tryAgain: Unable to communicate with CDAP services. Retrying in
+      timeOut: Timed out while attempting to communicate with CDAP services. Please contact your system administrator.
+    SplashScreen:
+      welcomeMessage: Welcome to CDAP 4.0
+      welcomeMessage1: New User Interface
+      introText: Introducing Cask Market
+      introText1: Cask's App Store for Big Data
+      caskmarket: Cask Market
+      gotoLabel: Go to CDAP
+      disclaimerMessage: For full feature parity, switch to original UI by clicking "VIEW ORIGINAL UI" in top navigation bar.
+    Header:
+      filterBy: Filter by
+      search-placeholder: Search
+      sortdropdown-tooltip: Clear Search to enable Sort
+      search-disabled-placeholder: Sort by Relevance to Search
+      sort: Sort
+      sortLabel: "Sort by "
+      sortOptions:
+        none: ''
+        entityNameAsc:
+          displayName: A - Z
+        entityNameDesc:
+          displayName: Z - A
+        creationTimeDesc:
+          displayName: Newest
+        creationTimeAsc:
+          displayName: Oldest
+    NamespaceNotFound:
+      createMessage: Would like to
+      createLinkLabel: create a new one?
+      switchMessage: Or select a different namespace from the namespace dropdown.
+  Dashboard:
+    Title: Dashboard
+
+  DetailView:
+    PropertiesTab:
+      title: "{entityId} Properties"
+
+  FileDnD:
+    uploadLabel: Drag-and-drop the file to be uploaded
+    clickLabel: Click to select file from your computer
+  FastAction:
+    deleteConfirmation: Are you sure you want to delete *_{entityId}_*?
+    exploreLabel: Explore
+    deleteLabel: Delete
+    deleteFailed: Failed to delete {entityId}.
+    truncateConfirmation: Are you sure you want to truncate *_{entityId}_*?
+    truncateLabel: Truncate
+    truncateSuccess: Truncated Successfully
+    truncateFailed: Failed to truncate {entityId}.
+    sendEventsLabel: Send Events
+    setPreferencesModalLabel: Preferences
+    setPreferencesActionLabel: Set Preferences
+    setPreferencesDescriptionLabel:
+      system: Specify new or edit existing system preferences. These preferences will be accessible in all namespaces, applications, and programs.
+      namespace: Specify new or override existing system preferences. These preferences will be accessible in all applications within this namespace.
+      app: Specify new or override existing system or namespace preferences. These preferences will be accessible in all programs within this application.
+      program: Specify new or override existing system, namespace, or application preferences. These preferences will only be accessible within this program.
+    setPreferencesButtonLabel:
+      saveAndClose: Save & Close
+      saving: Saving
+    setPreferencesInheritedPrefsLabel: Inherited Preferences
+    setPreferencesColumnLabel:
+      key: KEY
+      value: VALUE
+    setPreferencesReset: Reset
+    setPreferencesFailed: Error - Set Preferences Failed.
+    setPreferencesSuccess:
+      default: "{entityType} Preferences Saved"
+    start: Start
+    stop: Stop
+    sendEventsButtonLabel: Send
+    clearEventsButtonLabel: Clear
+    sendEventsClickLabel: Click to input events.
+    sendEventsFailed: Error - Send Events Failed.
+    sendEventsSuccess: Success - Events uploaded successfully.
+    startConfirmLabel: Start
+    stopConfirmLabel: Stop
+    startConfirmation: "Are you sure you want to start the program: *_{entityId}_*?"
+    stopConfirmation: "Are you sure you want to stop the program:  *_{entityId}_*?"
+    stopProgramHeader: Stop Program
+    startProgramHeader: Start Program
+
+  JumpButton:
+    buttonLabel: Jump
+    viewHydrator: View in Hydrator
+    viewTracker: View in Tracker
+
+  Management:
+    Title: Management
+    Top:
+      version-label: Version
+      time-label: Uptime
+      services: Services
+      updated: Last updated
+      updated-label:
+        plural: seconds ago
+        singular: second ago
+      primaryLabelOne: DAY
+      primaryLabelTwo: HR
+      primaryLabelThree: MIN
+    Panels:
+      nodes: Nodes
+      virtual-cores: Virtual Cores
+      memory: Memory
+      application: Application
+    Services:
+      appfabric: App Fabric
+      messaging_service: Messaging Service
+      log_saver: Log Saver
+      metrics_processor: Metrics Processor
+      dataset_executor: Dataset Executor
+      metadata_service: Metadata Service
+      remote_system_operation: Remote System Operation
+      streams: Streams
+      explore_service: Explore Service
+      metrics: Metrics
+      transaction: Transaction
+      setBtn: Set
+      requested: Requested
+    Configure:
+      title: Configure
+      buttons:
+        add-ns: Add Namespace
+        set-system-preferences: Set System Preferences
+        view-config: View Configurations
+        manage-ns: Manage Namespaces
+        delete-ns: Delete Namespace
+        manage-roles: Manage Roles
+        reset-instance: Reset Instance
+        tag-management: Tag Management
+        instance-preference: Instance Preference
+        delete-datasets: Delete All Datasets
+        view-invalid: View Invalid Transactions
+    DetailPanel:
+      headers:
+        apps: Apps
+        blocks: Blocks
+        connections: Connections
+        entities: Entities
+        load: Load
+        nodes: Nodes
+        queues: Queues
+        resources: Resources
+        storage: Storage
+        transactions: Transactions
+      labels:
+        Accepted: Accepted
+        RemainingBytes: Available
+        Applications: Applications
+        Artifacts: Artifacts
+        AverageRegionsPerServer: Average Regions per Server
+        ClientErrors: Client Errors
+        CorruptBlocks: Corrupt Blocks
+        Datasets: Datasets
+        DeadRegionServers: Dead Region Servers
+        ErrorLogs: Errors in Logs
+        Failed: Failed
+        Finished: Finished
+        FreeMemory: Free Memory
+        FreeVCores: Free Virtual Cores
+        HealthyNodes: Healthy Nodes
+        HealthyContainers: Healthy Containers
+        Killed: Killed
+        New: New
+        NewNodes: New Nodes
+        NewContainers: New Containers
+        Masters: Masters
+        MissingBlocks: Missing Blocks
+        Namenodes: Namenodes
+        Namespaces: Namespaces
+        NumCommittingChangeSets: Committing Changes
+        NumCommittedChangeSets: Committed Changes
+        NumInProgressTransactions: In-Progress Transactions
+        NumInvalidTransactions: Invalid Transactions
+        NumRequests: No. of Requests
+        Programs: Programs
+        ReadPointer: Read Pointer
+        RegionServers: Region Servers
+        RegionsInTransition: Regions in Transition
+        Running: Running
+        ServerErrors: Server Errors
+        Snapshots: Snapshots
+        SnapshotTime: Last Snapshot Time
+        Stopped: Stopped
+        Streams: Streams
+        StreamViews: Stream Views
+        Submitted: Submitted
+        Successful: Successful
+        Tables: Tables
+        Total: Total
+        TotalBytes: Total
+        TotalNodes: Total Nodes
+        TotalContainers: Total Containers
+        TotalMemory: Total Memory
+        TotalRegions: Total Regions
+        TotalRequests: Total Requests
+        TotalVCores: Total Virtual Cores
+        UnderReplicatedBlocks: Under Replicated Blocks
+        UsedBytes: Used
+        UsedMemory: Used Memory
+        UsedVCores: Used Virtual Cores
+        UnusableNodes: Unusable Nodes
+        UnusableContainers: Unusable Containers
+        VisibilityUpperBound: Visibility Upper Bound
+        WarnLogs: Warnings in Logs
+        WritePointer: Write Pointer
+
+    Component-Overview:
+      label: Component Overview
+      emptyMessage: Available only in Distributed mode
+      headers:
+        cdap: CDAP
+        cdh: CDH
+        hbase: HBASE
+        hdfs: HDFS
+        zookeeper: ZooKeeper
+        kafka: Kafka
+        spark: Spark
+        yarn: YARN
+
+  Market:
+    search-placeholder: Search
+    connectErrorMessage: Cannot connect to Market
+    tabs:
+      all: All
+      artifacts: Drivers
+      dashboards: Dashboards
+      datapacks: Datapacks
+      datasets: Datasets
+      examples: Applications
+      pipelines: Pipelines
+      plugins: Plugins
+      useCases: Use Cases
+      emptyTab: No Entities found
+    action-types:
+      create_stream:
+        name: Create
+      create_app:
+        name: Create
+      create_pipeline_draft:
+        name: Create
+      create_pipeline:
+        name: Create
+      create_artifact:
+        name: Create
+      create_plugin_artifact:
+        name: Deploy
+      create_driver_artifact:
+        name: Deploy
+      informational:
+        name: Download
+      deploy_app:
+        name: Deploy
+      load_datapack:
+        name: Load
+      one_step_deploy_app:
+        name: Deploy
+      one_step_deploy_plugin:
+        name: Deploy
+  MarketPlaceEntity:
+    Metadata:
+      version: Version
+      author: Author
+      company: Company
+      created: Created
+      cdapversion: CDAP Version
+    doneLabel: Done
+    closeLabel: Close
+  MarketEntityModal:
+    version: "Version :"
+  Navbar:
+    overviewLabel: Overview
+    pipelinesLabel: Pipelines
+    metadataLabel: Metadata
+    ProductDropdown:
+      logout: Logout
+      prodWebsiteLabel: Product Website
+      supportLabel: Support
+      documentationLabel: Documentation
+      aboutLabel: About CDAP
+    Metadata:
+      searchLabel: Search
+      integrationsLabel: Integrations
+      tagsLabel: Tags
+      dictionaryLabel: Dictionary
+    RightSection:
+      olduilink: View Original UI
+    NamespaceDropdown:
+      applications: Applications
+      namespaceLabel: Namespace
+      datasets: Datasets
+      streams: Streams
+      addNS: "Add Namespace"
+  Overview:
+    ProgramTab:
+      emptyMessage: No Programs found.
+      title: "Programs in \"{appId}\""
+      runningProgramLabel: "Number of programs running: {programCount}"
+    DatasetTab:
+      title: "Dataset Used by \"{appId}\""
+    SchemaTab:
+      emptyMessage: No Schema found.
+      title: Schema of each record in the {entityType} "{entityId}"
+      tooltip: Schema defines the structure of each record in the dataset. A schema is a collection of fields, where each field has a name and a data type.
+    Metadata:
+      ttl: "Time To Live (TTL): "
+      type: "Type: "
+    deployedLabel:
+      data: Created
+      app: Deployed
+  Pagination:
+    dropdown-label: Page
+  PropertiesEditor:
+    AddProperty:
+      button: Add Property
+      modalHeader: Add Property for {entityId}
+      keyPlaceholder: Enter name
+      valuePlaceholder: Enter value
+      shortError: Failed to add property
+      propertyExistError: Property {key} already exists
+    DeleteConfirmation:
+      shortError: Failed to delete property
+      headerTitle: Delete Confirmation
+      confirmationText: "Are you sure you want to delete \"{key}\" property?"
+      confirmButton: Delete
+    EditProperty:
+      shortError: Failed to save property
+      modalHeader: "Edit property: {key}"
+      valuePlaceholder: Enter new value
+      button: Save
+    system: System
+    user: Business
+    name: Name
+    value: Value
+    scope: Scope
+
+  Resource-Center:
+    Stream:
+      label: Stream
+      description: A stream is used to ingest data into HDFS in real-time or batch.
+      actionbtn0: Create
+    Application:
+      label: Application
+      description: Upload a custom application artifact or create an instance of an application from an existing artifact.
+      actionbtn0: Upload
+      actionbtn-1: Create
+      modalheadertitle: Upload Application
+    Stream-View:
+      label: Stream View
+      description: A stream view is non-materialized view over a stream with schema-on-read capability. Creates a view over an existing stream.
+      actionbtn0: Create
+    HydratorPipeline:
+      label: Pipeline
+      description: A pipeline allows you to ingest, egress, and process data either to, from, or within Hadoop.
+      actionbtn0: Create
+    Artifact:
+      label: Driver
+      description: A driver is a JAR file that contains third-party code to talk to external systems, such as MySQL, Oracle, and PostgreSQL.
+      actionbtn0: Upload
+      modalheadertitle: Add Driver
+    Plugins:
+      label: Plugin
+      description: A plugin is an easy way to extend the functionality of an application.
+      actionbtn0: Upload
+      modalheadertitle: Upload Plugin Artifact
+
+  SplashScreen:
+    dontShow: Don't show this again
+    buttons:
+      getStarted: Read the Docs
+      introduction: Intro to CDAP
+      register: Register for Updates
+    intro-message: Unified Integration Platform for Big Data
+    title: Welcome to
+    titleTwo: Cask Data Application Platform
+    version-label: Version 4.0
+    registration-zero: I
+    registration-one: would like to receive product updates and
+    registration-two: newsletters from Cask at this email address
+    getUpdates: Get Updates
+
+  SchemaEditor:
+    Labels:
+      fieldName: Field Name
+      symbolName: Symbol Name
+  Wizard:
+    ApplicationUpload:
+      headerlabel: Upload Application
+      Step1:
+        description: Upload your application JAR
+        shorttitle: Upload Application
+        title: Upload JAR
+        uploadHelperText: Upload the JAR for your application that you wish to deploy
+        filePathLabel: Choose file
+      success: You have successfully deployed the application
+      callToAction: View Application Details
+    ArtifactUpload:
+      headerlabel: Add Third party Driver
+      Step1:
+        description: Upload your Driver
+        shorttitle: Upload Driver
+        title: Upload JAR
+        uploadHelperText: Upload the third party driver that was downloaded from the previous step
+        filePathLabel: Choose file
+      Step2:
+        description: Configure the settings for your driver
+        shorttitle: Driver Configuration
+        title: Configure Driver
+        parentArtifactLabel: Parent Artifact
+        nameLabel: Name
+        namePlaceholder: Driver Name
+        descriptionLabel: Description
+        decriptionPlaceholder: Driver Description
+        typeLabel: Type
+        typePlaceholder: Driver Type
+        classnameLabel: Class Name
+        classnamePlaceholder: Driver Class Name
+      success: You have successfully uploaded the driver
+      subtitle: You can now create a pipeline to extract data from Database using the driver.
+      callToAction: Create a Pipeline
+    Done: Done
+    GoToHomePage: Go to Home Page
+    Informational:
+      termsandconditions: Terms and Conditions
+      Step1:
+        description: Please follow the steps specified below to download and configure
+        shorttitle: Download Information
+        title: Information
+      headerlabel: Download Information
+    MarketHydratorPluginUpload:
+      headerlabel: Add Hydrator Plugin
+    OneStepDeploy:
+      headerlabel: Deploy
+      Step1:
+        description: One step deploy
+        shorttitle: Deploy
+        title: Deploy
+        content: Deploy
+    Skip: Skipped
+    FailedMessage: Failed to {step}
+    StreamCreate:
+      Step1:
+        shorttitle: General Information
+        title: General
+        description: Provide information about the stream you want to create.
+        ttllabel: TTL
+        ttl-placeholder: Specify the time-to-live for events in seconds
+      Step2:
+        shorttitle: Setup Format and Schema
+        title: Set Format and Schema
+        description: Setting format and schema allows you to perform schema-on-read.
+      Step3:
+        shorttitle: Trigger Setup
+        title: Setup a Trigger
+        description: Setting up a trigger configures CDAP to notify systems observing to start processing.
+        thresholdlabel: The stream will notify any observers upon reaching this threshold to start processing the data in this stream.
+        mblabel: Megabytes (MB)
+      Step4:
+        shorttitle: Upload Data
+        title: Upload Data
+        description: Upload data to the stream you created.
+      headerlabel: Create Stream
+      success: You have successfully created the stream
+      callToAction: View Stream Details
+      secondaryCallToAction:
+        uploadData: Upload Data to Stream
+        queryStream: Query Stream
+    UploadData:
+      Step1:
+        shorttitle: View Data
+        title: View Data
+        description: Shows the data for your reference that would be uploaded to a destination.
+      Step2:
+        shorttitle: Select Destination
+        title: Select a Destination
+        description: Select the destination where the data needs to be uploaded.
+        dataentitynameplaceholder: Dataset/Stream Name
+        destinationtype: Destination Type
+        destinationname: Destination Name
+      headerlabel: Upload Data
+      success: You have successfully uploaded the datapack
+      subtitle: to the stream
+      callToAction: View Stream Details
+    PublishPipeline:
+      Step1:
+        shorttitle: Configure Pipeline
+        title: Configure a Pipeline
+        description: Specify the name of the pipeline.
+      pipelinenameplaceholder: Pipeline Name
+      headerlabel: Publish Pipeline
+      success: You have successfully created the pipeline
+      callToAction: Customize Pipeline
+    HydratorPipeline:
+      title: Create a Data Pipeline
+      message: Choose the pipeline type you would like to create.
+      batchLinkLabel: Batch Pipeline
+      realtimeLinkLabel: Realtime Pipeline
+    PluginArtifact:
+      Step1:
+        shorttitle: Upload Plugin JAR
+        title: Upload Plugin JAR
+        description: Upload your plugin JAR.
+        filePathLabel: Choose File
+        errorMessage: Invalid plugin. Plugin must be a JAR file.
+      Step2:
+        shorttitle: Upload Plugin Configuration JSON
+        title: Upload Plugin Configuration JSON
+        description: Upload the plugin configuration JSON.
+        errorMessage: Invalid plugin JSON. Plugin configuration should be in JSON format.
+        errorMessageParentArtifacts: Invalid plugin JSON. Please specify parent artifacts.
+      success: You have successfully uploaded the plugin
+      subtitle: Start creating a pipeline with the plugin.
+      callToAction: Create a Pipeline
+    Add-Namespace:
+       Step1:
+         ssd-label: "General Information"
+         sld-desc:  "Specify the name and the description of the namespace."
+         name-label: "Name"
+         name-placeholder: "Namespace name"
+         description-label: "Description"
+         description-placeholder: "Namespace description"
+         scheduler-queue-label: "Scheduler Queue"
+         scheduler-queue-placeholder: "Specify the YARN queue name to be associated with this namespace"
+       Step2:
+         ssd-label: "Namespace Mapping"
+         sld-label: "Specify mapping of namespace resources to the underlying existing storage resources."
+         hdfs-root-directory-label: "HDFS Root Directory"
+         hdfs-root-directory-placeholder: "Root directory of HDFS for new namespace root"
+         hive-db-name-label: "Hive Database Name"
+         hive-db-name-placeholder: "Hive db name for the new namespace."
+         hbase-nm-name-label: "HBase Namespace Name"
+         hbase-nm-name-placeholder: "Existing namespace in HBase for new namespace"
+       Step3:
+         ssd-label: "Security"
+         sld-label: "Specify credentials for securely impersonating programs running as a specified user."
+         principal-label: "Principal"
+         principal-placeholder: "User to be impersonated-as for jobs in the new namespace"
+         keytab-uri-label: "Keytab URI"
+         keytab-uri-placeholder: "Location of keytab file associated with the principal"
+       Step4:
+         ssd-label: "Preferences"
+         sld-label: "Specify preferences to be applied at the namespace level."
+         name-label: "Name"
+         name-placeholder: "Preference name"
+         value-label: "Value"
+         value-placeholder: "Preference value"
+       headerlabel: Add Namespace
+       Status:
+         creation-error-desc: "Failed to create namespace '%s'."
+         creation-success-desc: "Successfully created namespace '%s'."
+
+  Wrangler:
+    Actions:
+      WRANGLER_DROP_COLUMN: drop
+      WRANGLER_SPLIT_COLUMN: split
+      WRANGLER_MERGE_COLUMN: merge
+      WRANGLER_RENAME_COLUMN: rename
+      WRANGLER_UPPER_CASE_COLUMN: uppercase
+      WRANGLER_LOWER_CASE_COLUMN: lowercase
+      WRANGLER_TITLE_CASE_COLUMN: titlecase
+      WRANGLER_SUBSTRING_COLUMN: substring
+    ColumnActions:
+      Drop:
+        label: Drop
+      LowerCase:
+        label: Lowercase
+      Merge:
+        header: "Merge Column: {columnName}"
+        joinBy: Join By
+        label: Merge
+        mergedColumn: Merged Column Name
+        mergeWith: Merge With
+      Rename:
+        header: "Rename Column: {columnName}"
+        label: Rename
+        newName: "New Column Name"
+      Split:
+        firstColumn: First Split Column Name
+        header: "Split Column: {columnName}"
+        label: Split
+        secondColumn: Second Split Column Name
+        splitBy: Split by first occurence of
+      Substring:
+        beginIndex: Begin Index
+        endIndex: End Index
+        header: "Substring Column: {columnName}"
+        label: Substring
+        substringColumn: Substring Column Name
+      TitleCase:
+        label: Titlecase
+      UpperCase:
+        label: Uppercase
+
+    Errors:
+      MISSING_REQUIRED_FIELDS: Please fill out all required fields
+      INVALID_NAME: "Invalid column name. Column name can only be alphanumeric, '_', or '-'"
+      DUPLICATE_NAME: "Column name already exist. Please choose a different name"
+      INVALID_COLUMNS: "Column names can contain only A-Z, a-z, 0-9 and underscores. Invalid columns: {columns} "
+      DUPLICATE_COLUMNS: "Duplicates: {columns}"
+      NO_DATA: Please upload a file, enter data to process or choose data from existing datasets
+    ErrorsShortDescription:
+      INVALID_COLUMNS: Invalid column name.
+      DUPLICATE_COLUMNS: Duplicate column name.
+      NO_DATA: No data to process.
+    Explore:
+      browse: "Browse Dataset ({count})"
+      noData: No data
+      chooseField: "Choose one field to wrangle:"
+    Filter:
+      apply: Apply
+      filter: Filter
+      ignoreCase: Ignore Case
+      Options:
+        equal: Equal
+        doesNotEqual: Does not equal
+        lessThan: Less than
+        greaterThan: Greater than
+        lessEqual: Less or equal to
+        greaterEqual: Greater or equal to
+        startsWith: Starts with
+        endsWith: Ends with
+        contains: Contains
+    Header:
+      importData: Import Data
+    history: History
+    InputScreen:
+      ErrorTable:
+        error: Error
+        row: Row
+      HelperText:
+        click: "Click "
+        upload: " to upload a file"
+        or: or
+        paste: Click anywhere else to paste data
+      Options:
+        delimiter: Set delimiter
+        firstLineAsColumns: First line as column name
+        skipEmptyLines: Skip empty lines
+        convertToSchema: Make column names schema compatible
+    LeftPanel:
+      sort: Sort
+      selectColumn: Select a column to enable {type}
+    MetricsBar:
+      rows: Rows
+      columns: Columns
+      nulls: Nulls
+
+    Visualization:
+      line: Line
+      area: Area
+      bar: Bar
+      scatter: Scatter
+    wrangleButton: Wrangle
+    WrangleData:
+      applyToHydrator: Apply to Hydrator
+      addToHydrator: Add to Hydrator
+      wrangling: "Wrangling..."
+    Tooltips:
+      actions: Actions
+      redo: Redo
+      undo: Undo
+
+    parsing: "Parsing..."
+  LoadingIndicator:
+    defaultMessage: 'Loading...'
+    # backendDown: 'CDAP Services are not available',
+    backendDown: 'Unable to connect to CDAP Router'
+    backendDownSubtitle: 'Attempting to connect...'
+    nodeserverDown: 'User interface service is down'
+  StatusAlertMessage:
+    message: 'Services are back online'
+  Tags:
+    label: Tags
+    notags: No Tags added
+  Description:
+    label: Description
+    nodescription: No Description available
+  ViewSwitch:
+    nameLabel: Name
+    typeLabel: Type
+    actionsLabel: Actions
+    DatasetStreamTable:
+      readsLabel: Reads
+      writesLabel: Writes
+      eventsLabel: Events
+      sizeLabel: Size
+    ProgramTable:
+      lastStartedLabel: Last Started
+      statusLabel: Status
+  Page404:
+    genericMessage: Sorry, we are are not able to find the page you are looking for.
+    entityMessage: Sorry, we are not able to find {entityType}
+    subtitleMessage1: Here are some options on where to go next
+    subtitleMessage2: View all your entities in the
+    overviewLabel: Overview
+    manageLabel: Manage
+    pipelinesMessage: Pipelines
+...
