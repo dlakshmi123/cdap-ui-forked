@@ -1,0 +1,14 @@
+metrics.query.bind.address
+
+# Deprecated properties
+
+kafka.bind.address
+kafka.bind.port
+kafka.default.replication.factor
+kafka.log.dir
+kafka.log.retention.hours
+kafka.num.partitions
+kafka.zookeeper.connection.timeout.ms
+metadata.updates.kafka.broker.list
+metadata.updates.kafka.topic
+metadata.updates.publish.enabled
