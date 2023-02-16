@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>local</value>
+    </property>
+    <property>
+        <name>mapreduce.jobtracker.address</name>
+        <value>clocal</value>
+        <description>
+            See LocalClientProtocolProvider for more info
+        </description>
+    </property>
+    <property>
+      <name>mapreduce.job.counters.counter.name.max</name>
+      <value>256</value>
+    </property>
+</configuration>
