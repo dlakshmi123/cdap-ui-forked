@@ -1,0 +1,92 @@
+<!--
+  Copyright © 2015 Cask Data, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<div ng-if="$state.current.name === 'adapters.create'" ng-class="{ 'hydrator-start': !AdapterCreateController.preconfigured, 'hydrator-preconfigured': AdapterCreateController.preconfigured }">
+  <div class="row" ng-if="!AdapterCreateController.preconfigured">
+    <div class="col-lg-8 col-lg-offset-2 tiles-container">
+      <div class="row">
+        <div class="col-sm-12 heading text-center">
+          <h3>Welcome!</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 info text-center">
+          <h4>Hydrator makes it easy to prepare data so you<br/>can get down to business faster. Let's get started!</h4>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-3">
+          <div class="well well-md start-well text-center"
+            ng-click="AdapterCreateController.preconfigured = true">
+            <h4 class="select-preconfigure">Select a<br/>pre-configured<br/>pipeline</h4>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="well well-md start-well text-center"
+            ng-click="AdapterCreateController.openFileBrowser()">
+            <h4>Import a<br />Pipeline</h4>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <a ui-sref="adapters.create.studio({type: 'cdap-etl-batch'})">
+            <div class="well well-md start-well text-center">
+              <h4>Create a<br/>Batch Pipeline</h4>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-3">
+          <a ui-sref="adapters.create.studio({type: 'cdap-etl-realtime'})">
+            <div class="well well-md start-well text-center">
+              <h4>Create a<br />Realtime Pipeline</h4>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" ng-if="AdapterCreateController.preconfigured">
+    <div class="col-lg-8 col-lg-offset-2 tiles-container">
+      <div class="col-sm-12 heading preconfigured text-center">
+        <h3>
+          <button class="btn btn-default pull-left"
+            ng-click="AdapterCreateController.preconfigured = false">Back</button>
+          <span>Select a pre-configured pipeline</span>
+        </h3>
+      </div>
+      <div class="col-sm-3"
+          ng-repeat="template in AdapterCreateController.templates"
+          ng-click="AdapterCreateController.selectTemplate(template)"
+        >
+          <div class="well well-md start-well template-link">
+            <h4 class="template-name">{{ template.name }}</h4>
+            <p>{{ template.description }}</p>
+          </div>
+        </div>
+    </div>
+
+  </div>
+  <my-file-select class="sr-only"
+                  id="adapter-import-config-link"
+                  data-button-icon="fa-upload"
+                  on-file-select="AdapterCreateController.importFile($files)"
+                  data-button-label="Import">
+  </my-file-select>
+</div>
+<div ng-if="$state.current.name !== 'adapters.create'">
+  <ui-view/>
+</div>

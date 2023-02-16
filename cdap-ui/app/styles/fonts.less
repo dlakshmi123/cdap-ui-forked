@@ -1,0 +1,144 @@
+/*
+ * Copyright © 2015 Cask Data, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+
+.font-face(@fontName, @fontFile, @fontWeight) {
+  @font-face {
+    font-family: @fontName;
+    src: url('../fonts/@{fontFile}.eot');
+    src: url('../fonts/@{fontFile}.eot') format('embedded-opentype'),
+         url('../fonts/@{fontFile}.woff') format('woff'),
+         url('../fonts/@{fontFile}.ttf') format('truetype'),
+         url('../fonts/@{fontFile}.svg#@{fontName}') format('svg');
+    font-weight: @fontWeight;
+  }
+}
+
+@font-face {
+	font-family: 'icomoon';
+	src:url('../fonts/icomoon.eot?-lfhtf3');
+	src:url('../fonts/icomoon.eot?#iefix-lfhtf3') format('embedded-opentype'),
+  		url('../fonts/icomoon.woff?-lfhtf3') format('woff'),
+  		url('../fonts/icomoon.ttf?-lfhtf3') format('truetype'),
+  		url('../fonts/icomoon.svg?-lfhtf3#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-hydrator:before {
+	content: "\e61d";
+}
+.icon-SchemaEdge:before {
+	content: "\e61c";
+}
+.icon-ETLBatch:before {
+	content: "\e61a";
+}
+.icon-ETLRealtime:before {
+	content: "\e61b";
+}
+.icon-adapter:before {
+	content: "\e600";
+}
+.icon-app:before {
+	content: "\e601";
+}
+.icon-applicationtempaltes:before {
+	content: "\e602";
+}
+.icon-avro:before {
+	content: "\e603";
+}
+.icon-configuration:before {
+	content: "\e604";
+}
+.icon-datasets:before {
+	content: "\e605";
+}
+.icon-datatypes:before {
+	content: "\e606";
+}
+.icon-ETLsinks:before {
+	content: "\e607";
+}
+.icon-ETLsources:before {
+	content: "\e608";
+}
+.icon-ETLtemplates:before {
+	content: "\e609";
+}
+.icon-ETLtransforms:before {
+	content: "\e60a";
+}
+.icon-fist:before {
+	content: "\e60b";
+}
+.icon-jms:before {
+	content: "\e60c";
+}
+.icon-kafka:before {
+	content: "\e60d";
+}
+.icon-mapreduce:before {
+	content: "\e60e";
+}
+.icon-plugin-stream:before {
+	content: "\e60f";
+}
+.icon-programtypes:before {
+	content: "\e610";
+}
+.icon-projection:before {
+	content: "\e611";
+}
+.icon-reset:before {
+	content: "\e612";
+}
+.icon-service:before {
+	content: "\e613";
+}
+.icon-spark:before {
+	content: "\e614";
+}
+.icon-streams:before {
+	content: "\e615";
+}
+.icon-systempreferences:before {
+	content: "\e616";
+}
+.icon-systemsecruity:before {
+	content: "\e617";
+}
+.icon-tigon:before {
+	content: "\e618";
+}
+.icon-workflow:before {
+	content: "\e619";
+}
