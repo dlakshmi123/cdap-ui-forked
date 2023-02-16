@@ -1,0 +1,39 @@
+<div ncy-breadcrumb></div>
+
+<div class="row" program-heading>
+  <div class="col-sm-6">
+    <h2 class="programTitle">
+      <span ng-bind="$state.params.programId"></span>
+    </h2>
+    <div class="type-block">
+      <span class="icon-mapreduce"></span>
+      <small> Type: Mapreduce </small>
+    </div>
+  </div>
+  <div class="col-sm-6 text-right">
+
+    <my-start-stop-button
+      type="mapreduce"
+      is-stoppable="true">
+    </my-start-stop-button>
+    <!-- END OF BUTTON GROUP -->
+
+  </div>
+</div>
+
+<div class="cdap-subnav-end"></div>
+
+<ul class="nav nav-tabs slanted-tabs" role="tablist">
+  <li role="presentation" ui-sref-active="active">
+    <a ui-sref="mapreduce.detail.runs" ui-sref-opts="{reload: true}" role="tab">Runs</a>
+  </li>
+  <li role="presentation" ui-sref-active="active">
+    <a ui-sref="mapreduce.detail.datasets" role="tab">Datasets</a>
+  </li>
+  <li role="presentation" ui-sref-active="active">
+    <a ui-sref="mapreduce.detail.history" role="tab">History</a>
+  </li>
+</ul>
+
+<br />
+<ui-view role="tabpanel"/>
